@@ -31,4 +31,16 @@ my @def_calls = $mock->def->lazymock_calls;
 is @def_calls, 1;
 is_deeply $def_calls[0], ['ghi', []];
 
+# resets all call records
+$mock->lazymock_reset;
+
+# assert sub results
+my @def_calls_after_reset = $mock->def->lazymock_calls;
+is @def_calls_after_reset, 0;
+
+# assert results again
+my @calls_after_reset = $mock->lazymock_calls;
+is @calls_after_reset, 1, "TODO: want not to record a def call";
+is_deeply $calls_after_reset[0], ['def', []];
+
 done_testing;

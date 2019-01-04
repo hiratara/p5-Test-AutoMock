@@ -15,6 +15,7 @@ sub new {
         _lazymock_methods => $params{methods},
         _lazymock_name => $params{name},
         _lazymock_parent => $params{parent},
+        _lazymock_children => {},  # name => instance
         _lazymock_calls => [],
     } => $class;
 }
@@ -34,6 +35,12 @@ sub lazymock_add_method {
 }
 
 sub lazymock_calls { @{$_[0]->{_lazymock_calls}} }
+
+sub lazymock_reset {
+    my $self = shift;
+    $self->{_lazymock_calls} = [];
+    $_->lazymock_reset for values %{$self->{_lazymock_children}};
+}
 
 sub DESTROY {}
 
@@ -57,12 +64,15 @@ sub AUTOLOAD {
 
     # return value
     my $code = $self->{_lazymock_methods}{$meth} //= do {
+        # create new child
         weaken(my $weaken_self = $self);
-        my $new_mock = ref($self)->new(
+        my $child_mock = ref($self)->new(
             name => $meth,
             parent => $weaken_self,
         );
-        sub { $new_mock };
+        $self->{_lazymock_children}{$meth} = $child_mock;
+
+        sub { $child_mock };
     };
     $code->(@params);
 }
