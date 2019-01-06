@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More import => [qw(ok is like note done_testing)];
+use Test::More import => [qw(ok is is_deeply like note done_testing)];
 use Test::LazyMock;
 
 my $mock = Test::LazyMock->new(
@@ -45,6 +45,9 @@ $abc->lazymock_add_method(mno => 'mno');
     like $@, qr/`bar` has already been defined as a method\b/;
     is $ret, undef;
 }
+
+is_deeply [$mock->lazymock_calls], [],
+          q(hasn't been called any methods yet);
 
 is $mock->hoge->bar, 'bar';
 is $mock->hoge->boo, 'boo';
