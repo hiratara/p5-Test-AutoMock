@@ -10,18 +10,32 @@ sub new {
     my $class = shift;
     my %params = @_;
 
-    bless {
-        # TODO: support nested method defs
-        _lazymock_methods => $params{methods},
+    my $self = bless {
+        _lazymock_methods => {},  # method name => code-ref
         _lazymock_name => $params{name},
         _lazymock_parent => $params{parent},
         _lazymock_children => {},  # name => instance
         _lazymock_calls => [],
     } => $class;
+
+    # parse all method definitions
+    while (my ($k, $v) = each %{$params{methods} // {}}) {
+        $self->lazymock_add_method($k => $v);
+    }
+
+    $self;
 }
 
 sub lazymock_add_method {
     my ($self, $name, $code_or_value) = @_;
+
+    # handle nested method definitions
+    my ($method, $child_method) = split /->/, $name, 2;
+    if (defined $child_method) {
+        my $child = $self->lazymock_child($method);
+        $child->lazymock_add_method($child_method, $code_or_value);
+        return;
+    }
 
     my $code;
     if (ref $code_or_value // '' eq 'CODE') {
@@ -30,7 +44,6 @@ sub lazymock_add_method {
         $code = sub { $code_or_value };
     }
 
-    # TODO: support nested method defs
     $self->{_lazymock_methods}{$name} = $code;
 }
 
