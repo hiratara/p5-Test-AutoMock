@@ -29,13 +29,22 @@ sub new {
 sub lazymock_add_method {
     my ($self, $name, $code_or_value) = @_;
 
-    # handle nested method definitions
     my ($method, $child_method) = split /->/, $name, 2;
+
+    # check duplicates with pre-defined methods
+    die "`$method` has already been defined as a method"
+        if exists $self->{_lazymock_methods}{$method};
+
+    # handle nested method definitions
     if (defined $child_method) {
         my $child = $self->lazymock_child($method);
         $child->lazymock_add_method($child_method, $code_or_value);
         return;
     }
+
+    # check duplicates with fields
+    die "`$method` has already been defined as a field"
+        if exists $self->{_lazymock_children}{$method};
 
     my $code;
     if (ref $code_or_value // '' eq 'CODE') {
