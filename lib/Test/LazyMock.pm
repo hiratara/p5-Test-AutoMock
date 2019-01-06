@@ -52,6 +52,8 @@ sub lazymock_calls { @{$_[0]->{_lazymock_calls}} }
 sub lazymock_child {
     my ($self, $name) = @_;
 
+    return if exists $self->{_lazymock_methods}{$name};
+
     $self->{_lazymock_children}{$name} //= do {
         # create new child
         weaken(my $weaken_self = $self);

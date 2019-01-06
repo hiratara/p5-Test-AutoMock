@@ -22,6 +22,7 @@ is $mock->foo(100), 101;
 is $mock->lazymock_child('def'), $def;
 isa_ok $mock->lazymock_child('jkl')->lazymock_child('mno'),
        'Test::LazyMock';
+is $mock->lazymock_child('hoge'), undef, 'hoge returns 10 instead of a child';
 
 # assert results
 my @calls = $mock->lazymock_calls;
