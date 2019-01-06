@@ -13,7 +13,11 @@ my $mock = Test::LazyMock->new(
 );
 
 $mock->lazymock_add_method('foo->bar' => 'bar');
-$mock->lazymock_add_method('abc->jkl' => sub { "jkl$_[0]" });
+
+# define methods for children
+my $abc = $mock->lazymock_child('abc');
+$abc->lazymock_add_method(jkl => sub { "jkl$_[0]" });
+$abc->lazymock_add_method(mno => 'mno');
 
 {
     my $ret = eval {
@@ -48,6 +52,7 @@ is $mock->foo->hoge, 'hoge';
 is $mock->abc->def->ghi, 'ghi';
 is $mock->foo->bar, 'bar';
 is $mock->abc->jkl('JKL'), 'jklJKL';
+is $mock->abc->mno, 'mno';
 
 my $invalid_mock = eval {
     Test::LazyMock->new(
