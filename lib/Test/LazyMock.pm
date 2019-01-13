@@ -2,7 +2,7 @@ package Test::LazyMock;
 use 5.008001;
 use strict;
 use warnings;
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util qw(blessed refaddr weaken);
 
 our $VERSION = "0.01";
 
@@ -113,15 +113,14 @@ sub lazymock_reset {
 
 sub DESTROY {}
 
-sub AUTOLOAD {
-    my ($self, @params) = @_;
-    (my $meth = our $AUTOLOAD) =~ s/.*:://;
+sub _call_method {
+    my ($self, $meth, $ref_params, $default_handler) = @_;
 
     # follow up the chain of mocks and record calls
     my %seen;
-    my $cur_call = [$meth, \@params];
+    my $cur_call = [$meth, $ref_params];
     my $cur_mock = $self;
-    while ($cur_mock && ! $seen{int($cur_mock)}++) {
+    while (defined $cur_mock && ! $seen{refaddr($cur_mock)}++) {
         push @{$cur_mock->{_lazymock_calls}}, $cur_call;
 
         $cur_call = [
@@ -133,10 +132,19 @@ sub AUTOLOAD {
 
     # return value
     if (my $code = $self->{_lazymock_methods}{$meth}) {
-        $code->(@params);
+        $code->(@$ref_params);
+    } elsif (defined $default_handler) {
+        $default_handler->(@$ref_params);
     } else {
         $self->lazymock_child($meth);
     }
+}
+
+sub AUTOLOAD {
+    my ($self, @params) = @_;
+    (my $meth = our $AUTOLOAD) =~ s/.*:://;
+
+    $self->_call_method($meth => \@params, undef);
 }
 
 1;
