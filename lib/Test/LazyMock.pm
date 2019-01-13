@@ -2,7 +2,7 @@ package Test::LazyMock;
 use 5.008001;
 use strict;
 use warnings;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(blessed weaken);
 
 our $VERSION = "0.01";
 
@@ -12,6 +12,7 @@ sub new {
 
     my $self = bless {
         _lazymock_methods => {},  # method name => code-ref
+        _lazymock_isa => {},  # class name => 1
         _lazymock_name => $params{name},
         _lazymock_parent => $params{parent},
         _lazymock_children => {},  # name => instance
@@ -23,7 +24,22 @@ sub new {
         $self->lazymock_add_method($k => $v);
     }
 
+    if (my $isa = $params{isa}) {
+        my @args = ref $isa eq 'ARRAY' ? @$isa : ($isa, );
+        $self->lazymock_isa(@args);
+    }
+
     $self;
+}
+
+sub isa {
+    my $self = shift;
+    my ($name) = @_;
+
+    # don't look for _lazymock_isa if $self is a class name
+    blessed $self && $self->{_lazymock_isa}{$name}
+        ? 1
+        : $self->SUPER::isa(@_);
 }
 
 sub lazymock_add_method {
@@ -54,6 +70,15 @@ sub lazymock_add_method {
     }
 
     $self->{_lazymock_methods}{$name} = $code;
+}
+
+sub lazymock_isa {
+    my $self = shift;
+
+    my %isa;
+    @isa{@_} = map { 1 } @_;
+
+    $self->{_lazymock_isa} = \%isa;
 }
 
 sub lazymock_calls { @{$_[0]->{_lazymock_calls}} }
