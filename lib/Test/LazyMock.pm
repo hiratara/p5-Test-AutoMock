@@ -134,7 +134,7 @@ sub _call_method {
     if (my $code = $self->{_lazymock_methods}{$meth}) {
         $code->(@$ref_params);
     } elsif (defined $default_handler) {
-        $default_handler->(@$ref_params);
+        $self->$default_handler(@$ref_params);
     } else {
         $self->lazymock_child($meth);
     }

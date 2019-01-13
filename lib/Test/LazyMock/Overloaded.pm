@@ -7,11 +7,23 @@ use overload (
     # '%{}' => sub { _overload_nomethod(@_, '%{}') },
     '&{}' => sub { _overload_nomethod(@_, '&{}') },
     '*{}' => sub { _overload_nomethod(@_, '*{}') },
-    'nomethod' => \&_overload_nomethod,
+    nomethod => \&_overload_nomethod,
+    fallback => 0,
 );
 use parent qw(Test::LazyMock);
 
 my %default_overload_handlers = (
+    '+' => sub { $_[0] },
+    '-' => sub { $_[0] },
+    '*' => sub { $_[0] },
+    '/' => sub { $_[0] },
+    '%' => sub { $_[0] },
+    '**' => sub { $_[0] },
+    '<<' => sub { $_[0] },
+    '>>' => sub { $_[0] },
+    'x' => sub { $_[0] },
+    '.' => sub { $_[0] },
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     # '%{}' => sub { +{} },
@@ -19,6 +31,7 @@ my %default_overload_handlers = (
     '*{}' => sub { \*DUMMY },
 );
 
+my $x = 0;
 sub _overload_nomethod {
     my ($self, $other, $is_swapped, $operator, $is_numeric) = @_;
 
