@@ -34,9 +34,10 @@ my %default_overload_handlers = (
 my $x = 0;
 sub _overload_nomethod {
     my ($self, $other, $is_swapped, $operator, $is_numeric) = @_;
+    my $operator_name = "`$operator`";
 
     $self->_call_method(
-        $operator => [$other, $is_swapped],
+        $operator_name => [$other, $is_swapped],
         $default_overload_handlers{$operator},
     );
 }

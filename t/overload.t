@@ -20,16 +20,16 @@ use Test::LazyMock::Overloaded;
     my @calls = $mock->lazymock_calls;
     is @calls, 11;
     is_deeply $calls[0], ['z', []];
-    is_deeply $calls[1], ['z->+', [0, '']];
-    is_deeply $calls[2], ['z->-', [0, '']];
-    is_deeply $calls[3], ['z->*', [1, '']];
-    is_deeply $calls[4], ['z->/', [1, '']];
-    is_deeply $calls[5], ['z->%', [1, '']];
-    is_deeply $calls[6], ['z->**', [1, '']];
-    is_deeply $calls[7], ['z-><<', [0, '']];
-    is_deeply $calls[8], ['z->>>', [0, '']];
-    is_deeply $calls[9], ['z->x', [1, '']];
-    is_deeply $calls[10], ['z->.', ['', '']];
+    is_deeply $calls[1], ['z->`+`', [0, '']];
+    is_deeply $calls[2], ['z->`-`', [0, '']];
+    is_deeply $calls[3], ['z->`*`', [1, '']];
+    is_deeply $calls[4], ['z->`/`', [1, '']];
+    is_deeply $calls[5], ['z->`%`', [1, '']];
+    is_deeply $calls[6], ['z->`**`', [1, '']];
+    is_deeply $calls[7], ['z->`<<`', [0, '']];
+    is_deeply $calls[8], ['z->`>>`', [0, '']];
+    is_deeply $calls[9], ['z->`x`', [1, '']];
+    is_deeply $calls[10], ['z->`.`', ['', '']];
 }
 
 {
@@ -44,11 +44,11 @@ use Test::LazyMock::Overloaded;
     my @calls = $mock->lazymock_calls;
     is @calls, 6;
     is_deeply $calls[0], ['get_ref', []];
-    is_deeply $calls[1], ['get_ref->${}', [undef, '']];
-    is_deeply $calls[2], ['get_ref->@{}', [undef, '']];
-    is_deeply $calls[3], ['get_ref->&{}', [undef, '']];
-    is_deeply $calls[4], ['get_ref->*{}', [undef, '']];
-    is_deeply $calls[5], ['get_ref->%{}', [undef, '']];
+    is_deeply $calls[1], ['get_ref->`${}`', [undef, '']];
+    is_deeply $calls[2], ['get_ref->`@{}`', [undef, '']];
+    is_deeply $calls[3], ['get_ref->`&{}`', [undef, '']];
+    is_deeply $calls[4], ['get_ref->`*{}`', [undef, '']];
+    is_deeply $calls[5], ['get_ref->`%{}`', [undef, '']];
 }
 
 done_testing;
