@@ -72,6 +72,15 @@ my %default_overload_handlers = (
     '++' => sub { $_[0] },
     '--' => sub { $_[0] },
 
+    'atan2' => undef,
+    'cos' => undef,
+    'sin' => undef,
+    'exp' => undef,
+    'abs' => undef,
+    'log' => undef,
+    'sqrt' => undef,
+    'int' => undef,
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     '%{}' => sub { +{} },
