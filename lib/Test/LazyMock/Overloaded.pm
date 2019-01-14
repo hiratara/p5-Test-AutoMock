@@ -81,6 +81,11 @@ my %default_overload_handlers = (
     'sqrt' => undef,
     'int' => undef,
 
+    'bool' => sub { !! 1 },
+    '""' => sub { "\x00" },
+    '0+' => sub { 1 },
+    'qr' => sub { qr/.*/ },
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     '%{}' => sub { +{} },

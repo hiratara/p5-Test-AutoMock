@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More import => [qw(is is_deeply done_testing)];
+use Test::More import => [qw(ok is is_deeply done_testing)];
 use Test::LazyMock::Overloaded;
 
 {
@@ -202,6 +202,23 @@ use Test::LazyMock::Overloaded;
     is_deeply $calls[6], ['z->`log`', [undef, '']];
     is_deeply $calls[7], ['z->`sqrt`', [undef, '']];
     is_deeply $calls[8], ['z->`int`', [undef, '']];
+}
+
+{
+    my $mock = Test::LazyMock::Overloaded->new;
+    my $z = $mock->z;
+    ok $z ? 1 : 0;
+    is "$z", "\x00";
+    is sprintf('%d', $z), '1';
+    is qr/$z/, qr/.*/;
+
+    my @calls = $mock->lazymock_calls;
+    is @calls, 5;
+    is_deeply $calls[0], ['z', []];
+    is_deeply $calls[1], ['z->`bool`', [undef, '']];
+    is_deeply $calls[2], ['z->`""`', [undef, '']];
+    is_deeply $calls[3], ['z->`0+`', [undef, '']];
+    is_deeply $calls[4], ['z->`qr`', [undef, '']];
 }
 
 {
