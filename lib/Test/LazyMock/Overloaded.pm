@@ -41,6 +41,9 @@ my %default_overload_handlers = (
     '==' => undef,
     '!=' => undef,
 
+    '<=>' => undef,
+    'cmp' => undef,
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     '%{}' => sub { +{} },

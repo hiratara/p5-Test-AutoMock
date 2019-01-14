@@ -84,6 +84,19 @@ use Test::LazyMock::Overloaded;
 
 {
     my $mock = Test::LazyMock::Overloaded->new;
+    my $z = $mock->z;
+    my (undef) = ($z <=> 0);
+    my (undef) = ($z cmp 0);
+
+    my @calls = $mock->lazymock_calls;
+    is @calls, 3;
+    is_deeply $calls[0], ['z', []];
+    is_deeply $calls[1], ['z->`<=>`', [0, '']];
+    is_deeply $calls[2], ['z->`cmp`', [0, '']];
+}
+
+{
+    my $mock = Test::LazyMock::Overloaded->new;
     my $any_ref = $mock->get_ref;
     is $$any_ref, undef;
     is_deeply \@$any_ref, [];
