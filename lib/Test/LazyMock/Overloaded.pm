@@ -86,6 +86,8 @@ my %default_overload_handlers = (
     '0+' => sub { 1 },
     'qr' => sub { qr/.*/ },
 
+    '<>' => sub { undef },
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     '%{}' => sub { +{} },

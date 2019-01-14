@@ -223,6 +223,17 @@ use Test::LazyMock::Overloaded;
 
 {
     my $mock = Test::LazyMock::Overloaded->new;
+    my $z = $mock->z;
+    while (<$z>) {}
+
+    my @calls = $mock->lazymock_calls;
+    is @calls, 2;
+    is_deeply $calls[0], ['z', []];
+    is_deeply $calls[1], ['z->`<>`', [undef, '']];
+}
+
+{
+    my $mock = Test::LazyMock::Overloaded->new;
     my $any_ref = $mock->get_ref;
     is $$any_ref, undef;
     is_deeply \@$any_ref, [];
