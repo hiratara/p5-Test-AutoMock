@@ -4,7 +4,7 @@ use warnings;
 use overload (
     '${}' => sub { _overload_nomethod(@_, '${}') },
     '@{}' => sub { _overload_nomethod(@_, '@{}') },
-    # '%{}' => sub { _overload_nomethod(@_, '%{}') },
+    '%{}' => sub { _overload_nomethod(@_, '%{}') },
     '&{}' => sub { _overload_nomethod(@_, '&{}') },
     '*{}' => sub { _overload_nomethod(@_, '*{}') },
     nomethod => \&_overload_nomethod,
@@ -26,7 +26,7 @@ my %default_overload_handlers = (
 
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
-    # '%{}' => sub { +{} },
+    '%{}' => sub { +{} },
     '&{}' => sub { sub {} },
     '*{}' => sub { \*DUMMY },
 );
