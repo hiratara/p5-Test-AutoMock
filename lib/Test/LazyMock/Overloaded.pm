@@ -34,6 +34,13 @@ my %default_overload_handlers = (
     'x=' => sub { $_[0] },
     '.=' => sub { $_[0] },
 
+    '<' => undef,
+    '<=' => undef,
+    '>' => undef,
+    '>=' => undef,
+    '==' => undef,
+    '!=' => undef,
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     '%{}' => sub { +{} },
