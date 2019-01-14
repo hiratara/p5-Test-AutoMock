@@ -90,6 +90,8 @@ my %default_overload_handlers = (
 
     '-X' => sub { !! 0 },
 
+    # '~~' => sub { !! 1 },
+
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
     '%{}' => sub { +{} },
