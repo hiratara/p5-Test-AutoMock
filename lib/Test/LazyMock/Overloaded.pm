@@ -107,6 +107,13 @@ sub _overload_nomethod {
     return $self if $operator eq '=';
 
     my $operator_name = "`$operator`";
+    my $default_handler;
+    if (exists $default_overload_handlers{$operator}) {
+        $default_handler = $default_overload_handlers{$operator};
+    } else {
+        warn "unknown operator: $operator";
+    }
+
     $self->_call_method(
         $operator_name => [$other, $is_swapped],
         $default_overload_handlers{$operator},
