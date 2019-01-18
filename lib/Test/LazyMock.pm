@@ -164,17 +164,18 @@ sub _call_method {
     my ($self, $meth, $ref_params, $default_handler) = @_;
     my $self_fields = $self->_get_fields;
 
+    $default_handler //= sub {
+        my $self = shift;
+        $self->lazymock_child($meth);
+    };
+
     $self->_record_call($meth, $ref_params);
 
     # return value
-    if (my $child = $self_fields->{_lazymock_children}{$meth}) {
-        $child;
-    } elsif (my $code = $self_fields->{_lazymock_methods}{$meth}) {
+    if (my $code = $self_fields->{_lazymock_methods}{$meth}) {
         $code->(@$ref_params);
-    } elsif (defined $default_handler) {
-        $self->$default_handler(@$ref_params);
     } else {
-        $self->lazymock_child($meth);
+        $self->$default_handler(@$ref_params);
     }
 }
 

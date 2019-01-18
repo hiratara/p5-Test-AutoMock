@@ -158,26 +158,12 @@ sub _deref_array {
 
 sub _deref_code {
     my $self = shift;
-    my $name = '`&{}`';
-    my $self_fields = $self->_get_fields;
 
     # don't record `&{}` calls
 
-    $self_fields->{_lazymock_children}{$name} //= do {
-        my $name = '()';
-
-        # create tied hash
-        weaken(my $weaken_self = $self);
-        my $child_mock = ref($self)->new(
-            name => $name,
-            parent => $weaken_self,
-        );
-
-        sub {
-            $weaken_self->_record_call($name, [@_]);
-
-            $child_mock;
-        };
+    sub {
+        my @args = @_;
+        $self->_call_method('()', [@_], undef);
     };
 }
 

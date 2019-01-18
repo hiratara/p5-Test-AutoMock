@@ -31,69 +31,71 @@ sub TIEHASH {
 sub FETCH {
     my ($self, $key) = @_;
     my $method_name = "{$key}";
-
-    $self->_record_call($method_name, []);
-
-    $self->_get_hashref->{$key} //= $self->lazymock_child($method_name);
+    $self->_call_method($method_name, [], sub {
+        my $self = shift;
+        my $hashref = $self->_get_hashref;
+        $hashref->{$key} = $self->lazymock_child($method_name)
+                                                unless exists $hashref->{$key};
+        $hashref->{$key};
+    });
 }
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my $method_name = "{$key}";
-
-    $self->_record_call($method_name, [$value]);
-
-    $self->_get_hashref->{$key} = $value;
+    $self->_call_method("{$key}", [$value], sub {
+        my ($self, $value) = @_;
+        $self->_get_hashref->{$key} = $value;
+    });
 }
 
 sub DELETE {
     my ($self, $key) = @_;
-
-    $self->_record_call('DELETE', [$key]);
-
-    delete $self->_get_hashref->{$key};
+    $self->_call_method("DELETE", [$key], sub {
+        my ($self, $key) = @_;
+        delete $self->_get_hashref->{$key};
+    });
 }
 
 sub CLEAR {
     my $self = shift;
-
-    $self->_record_call('CLEAR', []);
-
-    %{$self->_get_hashref} = ();
+    $self->_call_method("CLEAR", [], sub {
+        my $self = shift;
+        %{$self->_get_hashref} = ();
+    });
 }
 
 sub EXISTS {
     my ($self, $key) = @_;
-
-    $self->_record_call('EXISTS', [$key]);
-
-    exists $self->_get_hashref->{$key};
+    $self->_call_method('EXISTS', [$key], sub {
+        my ($self, $key) = @_;
+        exists $self->_get_hashref->{$key};
+    });
 }
 
 sub FIRSTKEY {
     my $self = shift;
-
-    $self->_record_call('FIRSTKEY', []);
-
-    my $hashref = $self->_get_hashref;
-    keys %$hashref;  # reset each() iterator
-    each %$hashref;
+    $self->_call_method('FIRSTKEY', [], sub {
+        my $self = shift;
+        my $hashref = $self->_get_hashref;
+        keys %$hashref;  # reset each() iterator
+        each %$hashref;
+    });
 }
 
 sub NEXTKEY {
     my ($self, $lastkey) = @_;
-
-    $self->_record_call('NEXTKEY', [$lastkey]);
-
-    each %{$self->_get_hashref};
+    $self->_call_method('NEXTKEY', [$lastkey], sub {
+        my $self = shift;
+        each %{$self->_get_hashref};
+    });
 }
 
 sub SCALAR {
     my $self = shift;
-
-    $self->_record_call('SCALAR', []);
-
-    scalar %{$self->_get_hashref};
+    $self->_call_method('SCALAR', [], sub {
+        my $self = shift;
+        scalar %{$self->_get_hashref};
+    });
 }
 
 # sub DESTROY {
