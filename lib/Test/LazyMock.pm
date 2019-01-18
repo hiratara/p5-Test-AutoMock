@@ -160,7 +160,9 @@ sub _call_method {
     }
 
     # return value
-    if (my $code = $self_fields->{_lazymock_methods}{$meth}) {
+    if (my $child = $self_fields->{_lazymock_children}{$meth}) {
+        $child;
+    } elsif (my $code = $self_fields->{_lazymock_methods}{$meth}) {
         $code->(@$ref_params);
     } elsif (defined $default_handler) {
         $self->$default_handler(@$ref_params);
