@@ -4,13 +4,14 @@ use warnings;
 use overload (
     '${}' => sub { _overload_nomethod(@_, '${}') },
     '@{}' => sub { _overload_nomethod(@_, '@{}') },
-    '%{}' => sub { _overload_nomethod(@_, '%{}') },
+    '%{}' => \&_deref_hash,
     '&{}' => sub { _overload_nomethod(@_, '&{}') },
     '*{}' => sub { _overload_nomethod(@_, '*{}') },
     nomethod => \&_overload_nomethod,
     fallback => 0,
 );
 use parent qw(Test::LazyMock);
+use Scalar::Util qw(weaken);
 
 my %default_overload_handlers = (
     '+' => sub { $_[0] },
@@ -94,7 +95,6 @@ my %default_overload_handlers = (
 
     '${}' => sub { \ my $x },
     '@{}' => sub { [] },
-    '%{}' => sub { +{} },
     '&{}' => sub { sub {} },
     '*{}' => sub { \*DUMMY },
 );
@@ -118,6 +118,25 @@ sub _overload_nomethod {
         $operator_name => [$other, $is_swapped],
         $default_overload_handlers{$operator},
     );
+}
+
+sub _deref_hash {
+    my $self = shift;
+    my $name = '`%{}`';
+    my $self_fields = $self->_get_fields;
+
+    # don't record `%{}` calls
+
+    $self_fields->{_lazymock_children}{$name} //= do {
+        # create tied hash
+        weaken(my $weaken_self = $self);
+
+        # the child has no name, so it doesn't show on call history
+        require Test::LazyMock::TieHash;
+        tie my %h, 'Test::LazyMock::TieHash', undef, $weaken_self;
+
+        \%h;
+    };
 }
 
 1;

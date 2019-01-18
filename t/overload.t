@@ -270,7 +270,7 @@ use Test::LazyMock::Overloaded;
     is_deeply $calls[2], ['get_ref->`@{}`', [undef, '']];
     is_deeply $calls[3], ['get_ref->`&{}`', [undef, '']];
     is_deeply $calls[4], ['get_ref->`*{}`', [undef, '']];
-    is_deeply $calls[5], ['get_ref->`%{}`', [undef, '']];
+    is_deeply $calls[5], ['get_ref->FIRSTKEY', []];
 }
 
 done_testing;

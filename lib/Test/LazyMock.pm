@@ -140,9 +140,8 @@ sub _get_fields {
     $fields;
 }
 
-sub _call_method {
-    my ($self, $meth, $ref_params, $default_handler) = @_;
-    my $self_fields = $self->_get_fields;
+sub _record_call {
+    my ($self, $meth, $ref_params) = @_;
 
     # follow up the chain of mocks and record calls
     my %seen;
@@ -152,12 +151,20 @@ sub _call_method {
         my $cur_mock_fields = $cur_mock->_get_fields;
         push @{$cur_mock_fields->{_lazymock_calls}}, $cur_call;
 
-        $cur_call = [
-            join('->', $cur_mock_fields->{_lazymock_name} // '', $cur_call->[0]),
-            $cur_call->[1],
-        ];
+        my $method_name = $cur_call->[0];
+        my $parent_name = $cur_mock_fields->{_lazymock_name};
+        $method_name = "$parent_name->$method_name" if defined $parent_name;
+
+        $cur_call = [$method_name, $cur_call->[1]];
         $cur_mock = $cur_mock_fields->{_lazymock_parent};
     }
+}
+
+sub _call_method {
+    my ($self, $meth, $ref_params, $default_handler) = @_;
+    my $self_fields = $self->_get_fields;
+
+    $self->_record_call($meth, $ref_params);
 
     # return value
     if (my $child = $self_fields->{_lazymock_children}{$meth}) {
