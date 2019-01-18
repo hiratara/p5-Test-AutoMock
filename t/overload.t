@@ -259,18 +259,19 @@ use Test::LazyMock::Overloaded;
     my $any_ref = $mock->get_ref;
     is $$any_ref, undef;
     is_deeply \@$any_ref, [];
-    is $any_ref->(1, 2, 3), undef;
+    ok $any_ref->(1, 2, 3) ? 1 : 0;
     is ref \*$any_ref, 'GLOB';
     is_deeply \%$any_ref, {};
 
     my @calls = $mock->lazymock_calls;
-    is @calls, 6;
+    is @calls, 7;
     is_deeply $calls[0], ['get_ref', []];
     is_deeply $calls[1], ['get_ref->`${}`', [undef, '']];
     is_deeply $calls[2], ['get_ref->FETCHSIZE', []];
-    is_deeply $calls[3], ['get_ref->`&{}`', [undef, '']];
-    is_deeply $calls[4], ['get_ref->`*{}`', [undef, '']];
-    is_deeply $calls[5], ['get_ref->FIRSTKEY', []];
+    is_deeply $calls[3], ['get_ref->()', [1, 2, 3]];
+    is_deeply $calls[4], ['get_ref->()->`bool`', [undef, '']];
+    is_deeply $calls[5], ['get_ref->`*{}`', [undef, '']];
+    is_deeply $calls[6], ['get_ref->FIRSTKEY', []];
 }
 
 done_testing;

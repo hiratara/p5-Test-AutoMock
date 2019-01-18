@@ -5,7 +5,7 @@ use overload (
     '${}' => sub { _overload_nomethod(@_, '${}') },
     '@{}' => \&_deref_array,
     '%{}' => \&_deref_hash,
-    '&{}' => sub { _overload_nomethod(@_, '&{}') },
+    '&{}' => \&_deref_code,
     '*{}' => sub { _overload_nomethod(@_, '*{}') },
     nomethod => \&_overload_nomethod,
     fallback => 0,
@@ -94,7 +94,6 @@ my %default_overload_handlers = (
     # '~~' => sub { !! 1 },
 
     '${}' => sub { \ my $x },
-    '&{}' => sub { sub {} },
     '*{}' => sub { \*DUMMY },
 );
 
@@ -154,6 +153,31 @@ sub _deref_array {
         tie my @arr, 'Test::LazyMock::TieArray', undef, $weaken_self;
 
         \@arr;
+    };
+}
+
+sub _deref_code {
+    my $self = shift;
+    my $name = '`&{}`';
+    my $self_fields = $self->_get_fields;
+
+    # don't record `&{}` calls
+
+    $self_fields->{_lazymock_children}{$name} //= do {
+        my $name = '()';
+
+        # create tied hash
+        weaken(my $weaken_self = $self);
+        my $child_mock = ref($self)->new(
+            name => $name,
+            parent => $weaken_self,
+        );
+
+        sub {
+            $weaken_self->_record_call($name, [@_]);
+
+            $child_mock;
+        };
     };
 }
 
