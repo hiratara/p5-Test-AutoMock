@@ -267,7 +267,7 @@ use Test::LazyMock::Overloaded;
     is @calls, 6;
     is_deeply $calls[0], ['get_ref', []];
     is_deeply $calls[1], ['get_ref->`${}`', [undef, '']];
-    is_deeply $calls[2], ['get_ref->`@{}`', [undef, '']];
+    is_deeply $calls[2], ['get_ref->FETCHSIZE', []];
     is_deeply $calls[3], ['get_ref->`&{}`', [undef, '']];
     is_deeply $calls[4], ['get_ref->`*{}`', [undef, '']];
     is_deeply $calls[5], ['get_ref->FIRSTKEY', []];

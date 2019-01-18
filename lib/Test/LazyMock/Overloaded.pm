@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use overload (
     '${}' => sub { _overload_nomethod(@_, '${}') },
-    '@{}' => sub { _overload_nomethod(@_, '@{}') },
+    '@{}' => \&_deref_array,
     '%{}' => \&_deref_hash,
     '&{}' => sub { _overload_nomethod(@_, '&{}') },
     '*{}' => sub { _overload_nomethod(@_, '*{}') },
@@ -94,7 +94,6 @@ my %default_overload_handlers = (
     # '~~' => sub { !! 1 },
 
     '${}' => sub { \ my $x },
-    '@{}' => sub { [] },
     '&{}' => sub { sub {} },
     '*{}' => sub { \*DUMMY },
 );
@@ -136,6 +135,25 @@ sub _deref_hash {
         tie my %h, 'Test::LazyMock::TieHash', undef, $weaken_self;
 
         \%h;
+    };
+}
+
+sub _deref_array {
+    my $self = shift;
+    my $name = '`@{}`';
+    my $self_fields = $self->_get_fields;
+
+    # don't record `@{}` calls
+
+    $self_fields->{_lazymock_children}{$name} //= do {
+        # create tied hash
+        weaken(my $weaken_self = $self);
+
+        # the child has no name, so it doesn't show on call history
+        require Test::LazyMock::TieArray;
+        tie my @arr, 'Test::LazyMock::TieArray', undef, $weaken_self;
+
+        \@arr;
     };
 }
 
