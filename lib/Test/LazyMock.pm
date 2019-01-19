@@ -10,14 +10,18 @@ sub new {
     my $class = shift;
     my %params = @_;
 
-    my $self = bless {
+    my $self = {
         _lazymock_methods => {},  # method name => code-ref
         _lazymock_isa => {},  # class name => 1
         _lazymock_name => $params{name},
         _lazymock_parent => $params{parent},
         _lazymock_children => {},  # name => instance
         _lazymock_calls => [],
-    } => $class;
+    };
+    # avoid cyclic reference
+    weaken($self->{_lazymock_parent});
+
+    bless $self => $class;
 
     # parse all method definitions
     while (my ($k, $v) = each %{$params{methods} // {}}) {
@@ -90,10 +94,9 @@ sub lazymock_child {
 
     $self->{_lazymock_children}{$name} //= do {
         # create new child
-        weaken(my $weaken_self = $self);
         my $child_mock = ref($self)->new(
             name => $name,
-            parent => $weaken_self,
+            parent => $self,
         );
 
         $self->{_lazymock_children}{$name} = $child_mock;
