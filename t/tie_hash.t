@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok eq_set is is_deeply done_testing)];
-use Test::LazyMock::TieHash;
+use Test::LazyMock::Overloaded;
 
 {
-    my $mock = Test::LazyMock::TieHash->new;
+    my $mock = Test::LazyMock::Overloaded->new;
     my $hash = $mock->ref_hash;
 
     # FETCh

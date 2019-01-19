@@ -11,7 +11,8 @@ use overload (
     fallback => 0,
 );
 use parent qw(Test::LazyMock);
-use Scalar::Util qw(weaken);
+use Test::LazyMock::Tie::Array;
+use Test::LazyMock::Tie::Hash;
 
 my %default_overload_handlers = (
     '+' => sub { $_[0] },
@@ -97,6 +98,23 @@ my %default_overload_handlers = (
     '*{}' => sub { \*DUMMY },
 );
 
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
+    my $self_fields = $self->_get_fields;
+
+    $self_fields->{_lazymock_tie_hash} = do {
+        tie my %h, 'Test::LazyMock::Tie::Hash', $self;
+        \%h;
+    };
+    $self_fields->{_lazymock_tie_array} = do {
+        tie my @arr, 'Test::LazyMock::Tie::Array', $self;
+        \@arr;
+    };
+
+    $self;
+}
+
 my $x = 0;
 sub _overload_nomethod {
     my ($self, $other, $is_swapped, $operator, $is_numeric) = @_;
@@ -120,40 +138,20 @@ sub _overload_nomethod {
 
 sub _deref_hash {
     my $self = shift;
-    my $name = '`%{}`';
     my $self_fields = $self->_get_fields;
 
     # don't record `%{}` calls
 
-    $self_fields->{_lazymock_children}{$name} //= do {
-        # create tied hash
-        weaken(my $weaken_self = $self);
-
-        # the child has no name, so it doesn't show on call history
-        require Test::LazyMock::TieHash;
-        tie my %h, 'Test::LazyMock::TieHash', undef, $weaken_self;
-
-        \%h;
-    };
+    $self_fields->{_lazymock_tie_hash}
 }
 
 sub _deref_array {
     my $self = shift;
-    my $name = '`@{}`';
     my $self_fields = $self->_get_fields;
 
     # don't record `@{}` calls
 
-    $self_fields->{_lazymock_children}{$name} //= do {
-        # create tied hash
-        weaken(my $weaken_self = $self);
-
-        # the child has no name, so it doesn't show on call history
-        require Test::LazyMock::TieArray;
-        tie my @arr, 'Test::LazyMock::TieArray', undef, $weaken_self;
-
-        \@arr;
-    };
+    $self_fields->{_lazymock_tie_array};
 }
 
 sub _deref_code {

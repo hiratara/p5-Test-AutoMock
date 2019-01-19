@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply done_testing)];
-use Test::LazyMock::TieArray;
+use Test::LazyMock::Overloaded;
 
 {
-    my $mock = Test::LazyMock::TieArray->new;
+    my $mock = Test::LazyMock::Overloaded->new;
     my $array = $mock->ref_array;
 
     # FETCH
