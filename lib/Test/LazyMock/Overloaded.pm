@@ -11,8 +11,8 @@ use overload (
     fallback => 0,
 );
 use parent qw(Test::LazyMock);
-use Test::LazyMock::Tie::Array;
-use Test::LazyMock::Tie::Hash;
+use Test::LazyMock::Overloaded::TieArray;
+use Test::LazyMock::Overloaded::TieHash;
 
 my %default_overload_handlers = (
     '+' => sub { $_[0] },
@@ -104,11 +104,11 @@ sub new {
     my $self_fields = $self->_get_fields;
 
     $self_fields->{_lazymock_tie_hash} = do {
-        tie my %h, 'Test::LazyMock::Tie::Hash', $self;
+        tie my %h, 'Test::LazyMock::Overloaded::TieHash', $self;
         \%h;
     };
     $self_fields->{_lazymock_tie_array} = do {
-        tie my @arr, 'Test::LazyMock::Tie::Array', $self;
+        tie my @arr, 'Test::LazyMock::Overloaded::TieArray', $self;
         \@arr;
     };
 

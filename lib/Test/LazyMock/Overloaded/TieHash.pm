@@ -1,4 +1,4 @@
-package Test::LazyMock::Tie::Hash;
+package Test::LazyMock::Overloaded::TieHash;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);
