@@ -127,17 +127,22 @@ sub lazymock_reset {
 
 sub DESTROY {}
 
-sub _get_fields {
-    my $self = shift;
+sub _exec_without_overloads {
+    my ($self, $code) = @_;
     my $class = blessed $self or die '$self is not an object';
     $self->SUPER::isa(__PACKAGE__) or die '$self is not a sub class';
 
     bless $self, __PACKAGE__;  # disable operator overloads
-    my $fields = eval { $$self };
+    my $ret = eval { $code->() };
     bless $self, $class;
     $@ and die $@;
 
-    $fields;
+    $ret;
+}
+
+sub _get_fields {
+    my $self = shift;
+    $self->_exec_without_overloads(sub { $$self });
 }
 
 sub _record_call {

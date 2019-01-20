@@ -15,16 +15,17 @@ use Test::LazyMock::Overloaded::TieArray;
 use Test::LazyMock::Overloaded::TieHash;
 
 my %default_overload_handlers = (
-    '+' => sub { $_[0] },
-    '-' => sub { $_[0] },
-    '*' => sub { $_[0] },
-    '/' => sub { $_[0] },
-    '%' => sub { $_[0] },
-    '**' => sub { $_[0] },
-    '<<' => sub { $_[0] },
-    '>>' => sub { $_[0] },
-    'x' => sub { $_[0] },
-    '.' => sub { $_[0] },
+    '+' => undef,
+    '-' => undef,
+    '*' => undef,
+    '/' => undef,
+    '%' => undef,
+    '**' => undef,
+    '<<' => undef,
+    '>>' => undef,
+    'x' => undef,
+    '.' => undef,
+
     '+=' => sub { $_[0] },
     '-=' => sub { $_[0] },
     '*=' => sub { $_[0] },
@@ -53,22 +54,22 @@ my %default_overload_handlers = (
     'eq' => undef,
     'ne' => undef,
 
-    '&' => sub { $_[0] },
+    '&' => undef,
     '&=' => sub { $_[0] },
-    '|' => sub { $_[0] },
+    '|' => undef,
     '|=' => sub { $_[0] },
-    '^' => sub { $_[0] },
+    '^' => undef,
     '^=' => sub { $_[0] },
-    # '&.' => sub { $_[0] },
+    # '&.' => undef,
     # '&.=' => sub { $_[0] },
-    # '|.' => sub { $_[0] },
+    # '|.' => undef,
     # '|.=' => sub { $_[0] },
-    # '^.' => sub { $_[0] },
+    # '^.' => undef,
     # '^.=' => sub { $_[0] },
 
-    'neg' => sub { $_[0] },
-    '!' => sub { $_[0] },
-    '~' => sub { $_[0] },
+    'neg' => undef,
+    '!' => undef,
+    '~' => undef,
     # '~.' => sub { $_[0] },
 
     '++' => sub { $_[0] },
@@ -84,13 +85,16 @@ my %default_overload_handlers = (
     'int' => undef,
 
     'bool' => sub { !! 1 },
-    '""' => sub { "\x00" },
+    '""' => sub {
+        my $self = shift;
+        $self->_exec_without_overloads(sub { "$self" });
+    },
     '0+' => sub { 1 },
-    'qr' => sub { qr/.*/ },
+    'qr' => sub { qr// },
 
     '<>' => sub { undef },
 
-    '-X' => sub { !! 0 },
+    '-X' => undef,
 
     # '~~' => sub { !! 1 },
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More import => [qw(ok is is_deeply done_testing)];
+use Test::More import => [qw(ok is is_deeply like done_testing)];
 use Test::LazyMock::Overloaded;
 
 {
@@ -208,9 +208,9 @@ use Test::LazyMock::Overloaded;
     my $mock = Test::LazyMock::Overloaded->new;
     my $z = $mock->z;
     ok $z ? 1 : 0;
-    is "$z", "\x00";
+    like "$z", qr/\bLazyMock\b/;
     is sprintf('%d', $z), '1';
-    is qr/$z/, qr/.*/;
+    is qr/$z/, qr//;
 
     my @calls = $mock->lazymock_calls;
     is @calls, 5;
@@ -238,9 +238,10 @@ use Test::LazyMock::Overloaded;
     my (undef) = (-e $z);
 
     my @calls = $mock->lazymock_calls;
-    is @calls, 2;
+    is @calls, 3;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`-X`', ['e', '']];
+    is_deeply $calls[2], ['z->`-X`->`bool`', [undef, '']];
 }
 
 # {
@@ -272,6 +273,26 @@ use Test::LazyMock::Overloaded;
     is_deeply $calls[4], ['get_ref->()->`bool`', [undef, '']];
     is_deeply $calls[5], ['get_ref->`*{}`', [undef, '']];
     is_deeply $calls[6], ['get_ref->FIRSTKEY', []];
+}
+
+{
+    # a difference between + and +=, ++
+    my $mock = Test::LazyMock::Overloaded->new;
+    my $n = $mock->n;
+    my $m = $n + 1;
+    $n += 1;
+    $m++;
+    is sprintf('%d', $n), '1';
+    is sprintf('%d', $m), '1';
+
+    my @calls = $mock->lazymock_calls;
+    is @calls, 6;
+    is_deeply $calls[0], ['n', []];
+    is_deeply $calls[1], ['n->`+`', [1, '']];
+    is_deeply $calls[2], ['n->`+=`', [1, undef]];
+    is_deeply $calls[3], ['n->`+`->`++`', [undef, '']];
+    is_deeply $calls[4], ['n->`0+`', [undef, '']];
+    is_deeply $calls[5], ['n->`+`->`0+`', [undef, '']];
 }
 
 done_testing;
