@@ -2,7 +2,7 @@ package Test::LazyMock;
 use 5.008001;
 use strict;
 use warnings;
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util qw(blessed refaddr weaken);
 
 our $VERSION = "0.01";
 
@@ -10,7 +10,8 @@ sub new {
     my $class = shift;
     my %params = @_;
 
-    my $self = {
+    # considering overloaded dereference operators, use ref of hash-ref
+    my $self_fields = {
         _lazymock_methods => {},  # method name => code-ref
         _lazymock_isa => {},  # class name => 1
         _lazymock_name => $params{name},
@@ -19,9 +20,9 @@ sub new {
         _lazymock_calls => [],
     };
     # avoid cyclic reference
-    weaken($self->{_lazymock_parent});
+    weaken($self_fields->{_lazymock_parent});
 
-    bless $self => $class;
+    my $self = bless \$self_fields => $class;
 
     # parse all method definitions
     while (my ($k, $v) = each %{$params{methods} // {}}) {
@@ -37,23 +38,27 @@ sub new {
 }
 
 sub isa {
-    my $self = shift;
+    my $class_or_self = shift;
     my ($name) = @_;
 
     # don't look for _lazymock_isa if $self is a class name
-    blessed $self && $self->{_lazymock_isa}{$name}
-        ? 1
-        : $self->SUPER::isa(@_);
+    if (blessed $class_or_self) {
+        my $self_fields = $class_or_self->_get_fields;
+        return 1 if $self_fields->{_lazymock_isa}{$name};
+    }
+
+    $class_or_self->SUPER::isa(@_);
 }
 
 sub lazymock_add_method {
     my ($self, $name, $code_or_value) = @_;
+    my $self_fields = $self->_get_fields;
 
     my ($method, $child_method) = split /->/, $name, 2;
 
     # check duplicates with pre-defined methods
     die "`$method` has already been defined as a method"
-        if exists $self->{_lazymock_methods}{$method};
+        if exists $self_fields->{_lazymock_methods}{$method};
 
     # handle nested method definitions
     if (defined $child_method) {
@@ -64,7 +69,7 @@ sub lazymock_add_method {
 
     # check duplicates with fields
     die "`$method` has already been defined as a field"
-        if exists $self->{_lazymock_children}{$method};
+        if exists $self_fields->{_lazymock_children}{$method};
 
     my $code;
     if (ref $code_or_value // '' eq 'CODE') {
@@ -73,33 +78,40 @@ sub lazymock_add_method {
         $code = sub { $code_or_value };
     }
 
-    $self->{_lazymock_methods}{$name} = $code;
+    $self_fields->{_lazymock_methods}{$name} = $code;
 }
 
 sub lazymock_isa {
     my $self = shift;
+    my $self_fields = $self->_get_fields;
 
     my %isa;
     @isa{@_} = map { 1 } @_;
 
-    $self->{_lazymock_isa} = \%isa;
+    $self_fields->{_lazymock_isa} = \%isa;
 }
 
-sub lazymock_calls { @{$_[0]->{_lazymock_calls}} }
+sub lazymock_calls {
+    my $self = shift;
+    my $self_fields = $self->_get_fields;
+
+    @{$self_fields->{_lazymock_calls}}
+}
 
 sub lazymock_child {
     my ($self, $name) = @_;
+    my $self_fields = $self->_get_fields;
 
-    return if exists $self->{_lazymock_methods}{$name};
+    return if exists $self_fields->{_lazymock_methods}{$name};
 
-    $self->{_lazymock_children}{$name} //= do {
+    $self_fields->{_lazymock_children}{$name} //= do {
         # create new child
         my $child_mock = ref($self)->new(
             name => $name,
             parent => $self,
         );
 
-        $self->{_lazymock_children}{$name} = $child_mock;
+        $self_fields->{_lazymock_children}{$name} = $child_mock;
 
         $child_mock;
     };
@@ -107,36 +119,76 @@ sub lazymock_child {
 
 sub lazymock_reset {
     my $self = shift;
-    $self->{_lazymock_calls} = [];
-    $_->lazymock_reset for values %{$self->{_lazymock_children}};
+    my $self_fields = $self->_get_fields;
+
+    $self_fields->{_lazymock_calls} = [];
+    $_->lazymock_reset for values %{$self_fields->{_lazymock_children}};
 }
 
 sub DESTROY {}
+
+sub _exec_without_overloads {
+    my ($self, $code) = @_;
+    my $class = blessed $self or die '$self is not an object';
+    $self->SUPER::isa(__PACKAGE__) or die '$self is not a sub class';
+
+    bless $self, __PACKAGE__;  # disable operator overloads
+    my $ret = eval { $code->() };
+    bless $self, $class;
+    $@ and die $@;
+
+    $ret;
+}
+
+sub _get_fields {
+    my $self = shift;
+    $self->_exec_without_overloads(sub { $$self });
+}
+
+sub _record_call {
+    my ($self, $meth, $ref_params) = @_;
+
+    # follow up the chain of mocks and record calls
+    my %seen;
+    my $cur_call = [$meth, $ref_params];
+    my $cur_mock = $self;
+    while (defined $cur_mock && ! $seen{refaddr($cur_mock)}++) {
+        my $cur_mock_fields = $cur_mock->_get_fields;
+        push @{$cur_mock_fields->{_lazymock_calls}}, $cur_call;
+
+        my $method_name = $cur_call->[0];
+        my $parent_name = $cur_mock_fields->{_lazymock_name};
+        $method_name = "$parent_name->$method_name" if defined $parent_name;
+
+        $cur_call = [$method_name, $cur_call->[1]];
+        $cur_mock = $cur_mock_fields->{_lazymock_parent};
+    }
+}
+
+sub _call_method {
+    my ($self, $meth, $ref_params, $default_handler) = @_;
+    my $self_fields = $self->_get_fields;
+
+    $default_handler //= sub {
+        my $self = shift;
+        $self->lazymock_child($meth);
+    };
+
+    $self->_record_call($meth, $ref_params);
+
+    # return value
+    if (my $code = $self_fields->{_lazymock_methods}{$meth}) {
+        $code->(@$ref_params);
+    } else {
+        $self->$default_handler(@$ref_params);
+    }
+}
 
 sub AUTOLOAD {
     my ($self, @params) = @_;
     (my $meth = our $AUTOLOAD) =~ s/.*:://;
 
-    # follow up the chain of mocks and record calls
-    my %seen;
-    my $cur_call = [$meth, \@params];
-    my $cur_mock = $self;
-    while ($cur_mock && ! $seen{int($cur_mock)}++) {
-        push @{$cur_mock->{_lazymock_calls}}, $cur_call;
-
-        $cur_call = [
-            join('->', $cur_mock->{_lazymock_name} // '', $cur_call->[0]),
-            $cur_call->[1],
-        ];
-        $cur_mock = $cur_mock->{_lazymock_parent};
-    }
-
-    # return value
-    if (my $code = $self->{_lazymock_methods}{$meth}) {
-        $code->(@params);
-    } else {
-        $self->lazymock_child($meth);
-    }
+    $self->_call_method($meth => \@params, undef);
 }
 
 1;
