@@ -52,7 +52,21 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hiratara/p5-Test-LazyMock/issues"
+      },
+      "homepage" : "https://github.com/hiratara/p5-Test-LazyMock",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hiratara/p5-Test-LazyMock.git",
+         "web" : "https://github.com/hiratara/p5-Test-LazyMock"
+      }
+   },
    "version" : "0.01",
+   "x_contributors" : [
+      "Masahiro Honma <hira.tara@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }
