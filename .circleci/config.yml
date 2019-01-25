@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: perl:5.28
+    steps:
+      - checkout
+      - restore_cache:
+          key: cacheminil
+      - run:
+          name: Install Minilla
+          command: |
+            cpanm Minilla
+      - save_cache:
+          key: cacheminil
+          paths:
+            - "/usr/local/bin"
+            - "/usr/local/lib/perl5/site_perl/5.28.0"
+      - restore_cache:
+          key: cachelocal-{{ checksum "cpanfile" }}
+      - run:
+          name: Build
+          command: |
+            minil build
+      - save_cache:
+          key: cachelocal-{{ checksum "cpanfile" }}
+          paths:
+            - "local"
+      - run:
+          name: Test
+          command: |
+            minil test
