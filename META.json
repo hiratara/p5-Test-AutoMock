@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "namespace::autoclean" : "0",
             "perl" : "5.008001"
          }
       },

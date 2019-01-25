@@ -2,7 +2,9 @@ package Test::LazyMock;
 use 5.008001;
 use strict;
 use warnings;
+use namespace::autoclean;
 use Scalar::Util qw(blessed refaddr weaken);
+use Test::More import => [qw(ok eq_array)];
 
 our $VERSION = "0.01";
 
@@ -123,6 +125,36 @@ sub lazymock_reset {
 
     $self_fields->{_lazymock_calls} = [];
     $_->lazymock_reset for values %{$self_fields->{_lazymock_children}};
+}
+
+sub _find_call {
+    my ($self, $method) = @_;
+    my @calls = $self->lazymock_calls;
+    grep { $_->[0] eq $method } @calls;
+}
+
+sub lazymock_called_with_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my ($self, $method, $args) = @_;
+    my @calls = $self->_find_call($method);
+    my @calls_with_args = grep { eq_array $args, $_->[1] } @calls;
+    ok scalar @calls_with_args,
+       "$method has been called with correct arguments";
+}
+
+sub lazymock_called_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my ($self, $method) = @_;
+    ok !! $self->_find_call($method), "$method has been called";
+}
+
+sub lazymock_not_called_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my ($self, $method) = @_;
+    ok ! $self->_find_call($method), "$method has not been called";
 }
 
 sub DESTROY {}
