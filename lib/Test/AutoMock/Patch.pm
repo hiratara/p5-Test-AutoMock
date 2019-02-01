@@ -28,3 +28,81 @@ sub patch_sub (&@) {
 }
 
 1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::AutoMock::Patch - Monkey patch for returning AutoMock
+
+=head1 SYNOPSIS
+
+    use Test::AutoMock::Patch qw(patch_sub);
+
+    # a black box function you want to test
+    sub get_metacpan {
+        my $ua = LWP::UserAgent->new;
+        my $response = $ua->get('https://metacpan.org/');
+        if ($response->is_success) {
+            return $response->decoded_content;  # or whatever
+        }
+        else {
+            die $response->status_line;
+        }
+    }
+
+    # apply a monkey patch to LWP::UserAgent::new
+    patch_sub {
+        my $mock = shift;
+
+        # set up the mock
+        $mock->automock_add_method('get->decoded_content' => "Hello, metacpan!\n");
+
+        # call blackbox function
+        my $body = get_metacpan();
+
+        # assertions
+        is $body, "Hello, metacpan!\n";
+        $mock->automock_called_with_ok('get->is_success' => []);
+        $mock->automock_not_called_ok('get->status_line');
+    } 'LWP::UserAgent::new';
+
+=head1 DESCRIPTION
+
+Temporarily replace any subroutine and return AutoMock. It is convenient when
+mock can not be injected from outside.
+
+=head1 FUNCTIONS
+
+=head2 patch_sub
+
+    patch_sub {
+        my ($mock, $other_mock) = @_;
+
+        # write your test using $mock
+
+    } 'Path::To::subroutine', 'Path::To::other_subroutine';
+
+Replace the specified subroutine with one that returns C<AutoMock>, and execute
+the code in the block. The mock object is passed as the argument of the block
+by the number of replaced subroutines. After exiting the block, the patch is
+removed.
+
+The generated mock object is an instance of L<Test::AutoMock::Overloaded>.
+
+It is a common usage to patch the class method used as a constructor.
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Honma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Masahiro Honma E<lt>hiratara@cpan.orgE<gt>
+
+=cut
+
