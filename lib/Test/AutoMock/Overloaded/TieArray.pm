@@ -1,4 +1,4 @@
-package Test::LazyMock::Overloaded::TieArray;
+package Test::AutoMock::Overloaded::TieArray;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);
@@ -25,7 +25,7 @@ sub FETCH {
 
     $lazy_mock->_call_method($method_name, [], sub {
         my $self = shift;
-        $arrayref->[$key] = $self->lazymock_child($method_name)
+        $arrayref->[$key] = $self->automock_child($method_name)
                                                unless exists $arrayref->[$key];
         $arrayref->[$key];
     });

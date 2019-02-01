@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 use Test::More import => [qw(is is_deeply done_testing)];
-use Test::LazyMock::Overloaded;
+use Test::AutoMock::Overloaded;
 
-my $mock = Test::LazyMock::Overloaded->new(
+my $mock = Test::AutoMock::Overloaded->new(
     methods => {
         'hoge->{bar}->[3]' => sub { 3 },
         'hoge->[2]->{boo}' => 'boo',
@@ -11,7 +11,7 @@ my $mock = Test::LazyMock::Overloaded->new(
     },
 );
 
-is_deeply [$mock->lazymock_calls], [],
+is_deeply [$mock->automock_calls], [],
           q(hasn't been called any methods yet);
 
 is sprintf('%d', $mock->hoge->{bar}[3]), '3';

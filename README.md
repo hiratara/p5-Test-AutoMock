@@ -1,14 +1,14 @@
 # NAME
 
-Test::LazyMock - It's new $module
+Test::AutoMock - It's new $module
 
 # SYNOPSIS
 
-    use Test::LazyMock;
+    use Test::AutoMock;
 
 # DESCRIPTION
 
-Test::LazyMock is ...
+Test::AutoMock is ...
 
 # LICENSE
 

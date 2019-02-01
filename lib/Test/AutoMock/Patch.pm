@@ -1,8 +1,8 @@
-package Test::LazyMock::Patch;
+package Test::AutoMock::Patch;
 use strict;
 use warnings;
 use Exporter qw(import);
-use Test::LazyMock::Overloaded;
+use Test::AutoMock::Overloaded;
 
 our @EXPORT_OK = qw(patch_sub);
 
@@ -10,7 +10,7 @@ sub _patch_sub_one {
     my ($code, $subroutines, $mocks) = @_;
     my ($subroutine, @left_subroutines) = @$subroutines;
 
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my @new_mocks = (@$mocks, $mock);
 
     no strict 'refs';

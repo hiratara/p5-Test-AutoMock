@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply like note done_testing)];
-use Test::LazyMock;
+use Test::AutoMock;
 
-my $mock = Test::LazyMock->new(
+my $mock = Test::AutoMock->new(
     methods => {
         'hoge->bar' => sub { 'bar' },
         'hoge->boo' => 'boo',
@@ -12,16 +12,16 @@ my $mock = Test::LazyMock->new(
     },
 );
 
-$mock->lazymock_add_method('foo->bar' => 'bar');
+$mock->automock_add_method('foo->bar' => 'bar');
 
 # define methods for children
-my $abc = $mock->lazymock_child('abc');
-$abc->lazymock_add_method(jkl => sub { "jkl$_[0]" });
-$abc->lazymock_add_method(mno => 'mno');
+my $abc = $mock->automock_child('abc');
+$abc->automock_add_method(jkl => sub { "jkl$_[0]" });
+$abc->automock_add_method(mno => 'mno');
 
 {
     my $ret = eval {
-        $mock->lazymock_add_method('abc->def' => 'def');
+        $mock->automock_add_method('abc->def' => 'def');
         1;
     };
     like $@, qr/`def` has already been defined as a field\b/;
@@ -30,7 +30,7 @@ $abc->lazymock_add_method(mno => 'mno');
 
 {
     my $ret = eval {
-        $mock->lazymock_add_method('abc->def->ghi->jkl' => 'jkl');
+        $mock->automock_add_method('abc->def->ghi->jkl' => 'jkl');
         1;
     };
     like $@, qr/`ghi` has already been defined as a method\b/;
@@ -39,14 +39,14 @@ $abc->lazymock_add_method(mno => 'mno');
 
 {
     my $ret = eval {
-        $mock->lazymock_add_method('hoge->bar' => 'bar');
+        $mock->automock_add_method('hoge->bar' => 'bar');
         1;
     };
     like $@, qr/`bar` has already been defined as a method\b/;
     is $ret, undef;
 }
 
-is_deeply [$mock->lazymock_calls], [],
+is_deeply [$mock->automock_calls], [],
           q(hasn't been called any methods yet);
 
 is $mock->hoge->bar, 'bar';
@@ -58,7 +58,7 @@ is $mock->abc->jkl('JKL'), 'jklJKL';
 is $mock->abc->mno, 'mno';
 
 my $invalid_mock = eval {
-    Test::LazyMock->new(
+    Test::AutoMock->new(
         methods => {
             'hoge->foo' => 'foo',
             'hoge->foo->bar' => 'bar',

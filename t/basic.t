@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 use Test::More import => [qw(isa_ok is is_deeply done_testing)];
-use Test::LazyMock;
+use Test::AutoMock;
 
-my $mock = Test::LazyMock->new;
+my $mock = Test::AutoMock->new;
 # mock.hoge.return_value = 10
-$mock->lazymock_add_method(hoge => 10);
+$mock->automock_add_method(hoge => 10);
 # mock.foo.side_effect = lambda x: x + 1
-$mock->lazymock_add_method(foo => sub { $_[0] + 1 });
+$mock->automock_add_method(foo => sub { $_[0] + 1 });
 
 # call any methods
 $mock->abc;
@@ -19,13 +19,13 @@ is $mock->hoge, 10;
 is $mock->foo(100), 101;
 
 # access to child
-is $mock->lazymock_child('def'), $def;
-isa_ok $mock->lazymock_child('jkl')->lazymock_child('mno'),
-       'Test::LazyMock';
-is $mock->lazymock_child('hoge'), undef, 'hoge returns 10 instead of a child';
+is $mock->automock_child('def'), $def;
+isa_ok $mock->automock_child('jkl')->automock_child('mno'),
+       'Test::AutoMock';
+is $mock->automock_child('hoge'), undef, 'hoge returns 10 instead of a child';
 
 # assert results
-my @calls = $mock->lazymock_calls;
+my @calls = $mock->automock_calls;
 is @calls, 5;
 is_deeply $calls[0], ['abc', []];
 is_deeply $calls[1], ['def', []];
@@ -34,19 +34,19 @@ is_deeply $calls[3], ['hoge', []];
 is_deeply $calls[4], ['foo', [100]];
 
 # assert sub results
-my @def_calls = $mock->lazymock_child('def')->lazymock_calls;
+my @def_calls = $mock->automock_child('def')->automock_calls;
 is @def_calls, 1;
 is_deeply $def_calls[0], ['ghi', []];
 
 # resets all call records
-$mock->lazymock_reset;
+$mock->automock_reset;
 
 # assert sub results
-my @def_calls_after_reset = $mock->lazymock_child('def')->lazymock_calls;
+my @def_calls_after_reset = $mock->automock_child('def')->automock_calls;
 is @def_calls_after_reset, 0;
 
 # assert results again
-my @calls_after_reset = $mock->lazymock_calls;
+my @calls_after_reset = $mock->automock_calls;
 is @calls_after_reset, 0;
 
 done_testing;

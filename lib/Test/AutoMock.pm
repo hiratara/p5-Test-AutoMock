@@ -1,4 +1,4 @@
-package Test::LazyMock;
+package Test::AutoMock;
 use 5.008001;
 use strict;
 use warnings;
@@ -28,12 +28,12 @@ sub new {
 
     # parse all method definitions
     while (my ($k, $v) = each %{$params{methods} // {}}) {
-        $self->lazymock_add_method($k => $v);
+        $self->automock_add_method($k => $v);
     }
 
     if (my $isa = $params{isa}) {
         my @args = ref $isa eq 'ARRAY' ? @$isa : ($isa, );
-        $self->lazymock_isa(@args);
+        $self->automock_isa(@args);
     }
 
     $self;
@@ -52,7 +52,7 @@ sub isa {
     $class_or_self->SUPER::isa(@_);
 }
 
-sub lazymock_add_method {
+sub automock_add_method {
     my ($self, $name, $code_or_value) = @_;
     my $self_fields = $self->_get_fields;
 
@@ -64,8 +64,8 @@ sub lazymock_add_method {
 
     # handle nested method definitions
     if (defined $child_method) {
-        my $child = $self->lazymock_child($method);
-        $child->lazymock_add_method($child_method, $code_or_value);
+        my $child = $self->automock_child($method);
+        $child->automock_add_method($child_method, $code_or_value);
         return;
     }
 
@@ -83,7 +83,7 @@ sub lazymock_add_method {
     $self_fields->{_lazymock_methods}{$name} = $code;
 }
 
-sub lazymock_isa {
+sub automock_isa {
     my $self = shift;
     my $self_fields = $self->_get_fields;
 
@@ -93,14 +93,14 @@ sub lazymock_isa {
     $self_fields->{_lazymock_isa} = \%isa;
 }
 
-sub lazymock_calls {
+sub automock_calls {
     my $self = shift;
     my $self_fields = $self->_get_fields;
 
     @{$self_fields->{_lazymock_calls}}
 }
 
-sub lazymock_child {
+sub automock_child {
     my ($self, $name) = @_;
     my $self_fields = $self->_get_fields;
 
@@ -119,21 +119,21 @@ sub lazymock_child {
     };
 }
 
-sub lazymock_reset {
+sub automock_reset {
     my $self = shift;
     my $self_fields = $self->_get_fields;
 
     $self_fields->{_lazymock_calls} = [];
-    $_->lazymock_reset for values %{$self_fields->{_lazymock_children}};
+    $_->automock_reset for values %{$self_fields->{_lazymock_children}};
 }
 
 sub _find_call {
     my ($self, $method) = @_;
-    my @calls = $self->lazymock_calls;
+    my @calls = $self->automock_calls;
     grep { $_->[0] eq $method } @calls;
 }
 
-sub lazymock_called_with_ok {
+sub automock_called_with_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my ($self, $method, $args) = @_;
@@ -143,14 +143,14 @@ sub lazymock_called_with_ok {
        "$method has been called with correct arguments";
 }
 
-sub lazymock_called_ok {
+sub automock_called_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my ($self, $method) = @_;
     ok !! $self->_find_call($method), "$method has been called";
 }
 
-sub lazymock_not_called_ok {
+sub automock_not_called_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my ($self, $method) = @_;
@@ -203,7 +203,7 @@ sub _call_method {
 
     $default_handler //= sub {
         my $self = shift;
-        $self->lazymock_child($meth);
+        $self->automock_child($meth);
     };
 
     $self->_record_call($meth, $ref_params);
@@ -230,15 +230,15 @@ __END__
 
 =head1 NAME
 
-Test::LazyMock - It's new $module
+Test::AutoMock - It's new $module
 
 =head1 SYNOPSIS
 
-    use Test::LazyMock;
+    use Test::AutoMock;
 
 =head1 DESCRIPTION
 
-Test::LazyMock is ...
+Test::AutoMock is ...
 
 =head1 LICENSE
 

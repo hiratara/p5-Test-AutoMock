@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply done_testing)];
-use Test::LazyMock::Overloaded;
+use Test::AutoMock::Overloaded;
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $array = $mock->ref_array;
 
     # FETCH
@@ -49,7 +49,7 @@ use Test::LazyMock::Overloaded;
     # assert size of array
     is scalar @$array, 2;
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 17;
     is_deeply $calls[0], ['ref_array', []];
     is_deeply $calls[1], ['ref_array->[0]', []];

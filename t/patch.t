@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use lib './t/lib';
 use MyClient;
-use Test::LazyMock::Patch qw(patch_sub);
+use Test::AutoMock::Patch qw(patch_sub);
 use Test::More import => [qw(ok is is_deeply like done_testing)];
 
 sub _call_my_client () {
@@ -15,7 +15,7 @@ sub _call_my_client () {
 patch_sub {
     my $mock = shift;
     _call_my_client;
-    is_deeply [map { $_->[0] } $mock->lazymock_calls],
+    is_deeply [map { $_->[0] } $mock->automock_calls],
               [qw(get get->is_success get->is_success->`bool` get->content)];
 } qw(MyClient::new);
 
@@ -27,7 +27,7 @@ patch_sub {
 patch_sub {
     my $mock = shift;
     MyClient->method_not_found->ok;
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 1;
     is $calls[0][0], 'ok';
 } qw(MyClient::method_not_found);
@@ -42,11 +42,11 @@ patch_sub {
     Hoge->new->hoge;
     Bar->new->bar;
 
-    my @hoge_calls = $hoge_mock->lazymock_calls;
+    my @hoge_calls = $hoge_mock->automock_calls;
     is @hoge_calls, 1;
     is $hoge_calls[0][0], 'hoge';
 
-    my @bar_calls = $bar_mock->lazymock_calls;
+    my @bar_calls = $bar_mock->automock_calls;
     is @bar_calls, 1;
     is $bar_calls[0][0], 'bar';
 } qw(Hoge::new Bar::new);

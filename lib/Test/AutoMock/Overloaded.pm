@@ -1,4 +1,4 @@
-package Test::LazyMock::Overloaded;
+package Test::AutoMock::Overloaded;
 use strict;
 use warnings;
 use overload (
@@ -10,9 +10,9 @@ use overload (
     nomethod => \&_overload_nomethod,
     fallback => 0,
 );
-use parent qw(Test::LazyMock);
-use Test::LazyMock::Overloaded::TieArray;
-use Test::LazyMock::Overloaded::TieHash;
+use parent qw(Test::AutoMock);
+use Test::AutoMock::Overloaded::TieArray;
+use Test::AutoMock::Overloaded::TieHash;
 
 my %default_overload_handlers = (
     '+' => undef,
@@ -108,11 +108,11 @@ sub new {
     my $self_fields = $self->_get_fields;
 
     $self_fields->{_lazymock_tie_hash} = do {
-        tie my %h, 'Test::LazyMock::Overloaded::TieHash', $self;
+        tie my %h, 'Test::AutoMock::Overloaded::TieHash', $self;
         \%h;
     };
     $self_fields->{_lazymock_tie_array} = do {
-        tie my @arr, 'Test::LazyMock::Overloaded::TieArray', $self;
+        tie my @arr, 'Test::AutoMock::Overloaded::TieArray', $self;
         \@arr;
     };
 
