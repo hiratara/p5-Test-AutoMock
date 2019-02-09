@@ -115,3 +115,33 @@ sub SCALAR {
 
 1;
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::AutoMock::Overloaded::TieHash - Track operations to hash-ref
+
+=head1 DESCRIPTION
+
+This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
+hash-refs. You won't instantiate this class.
+
+For the sake of simplicity, we use the notation C<{key}> for C<FETCH> and
+C<STORE>. For other tie methods, record with the original name.
+
+See https://perldoc.perl.org/perltie.html#Tying-Hashes .
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Honma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Masahiro Honma E<lt>hiratara@cpan.orgE<gt>
+
+=cut
+
