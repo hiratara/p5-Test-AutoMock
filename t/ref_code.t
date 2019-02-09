@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply done_testing)];
-use Test::LazyMock::Overloaded;
+use Test::AutoMock::Overloaded;
 
-my $mock = Test::LazyMock::Overloaded->new;
+my $mock = Test::AutoMock::Overloaded->new;
 my $code = $mock->get_code;
 my $ret = $code->();
 ok $ret->{result} ? 1 : 0;
 
-my @calls = $mock->lazymock_calls;
+my @calls = $mock->automock_calls;
 is @calls, 4;
 is_deeply $calls[0], ['get_code', []];
 is_deeply $calls[1], ['get_code->()', []];

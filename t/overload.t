@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply like done_testing)];
-use Test::LazyMock::Overloaded;
+use Test::AutoMock::Overloaded;
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = ($z + 0);
     my (undef) = ($z - 0);
@@ -17,7 +17,7 @@ use Test::LazyMock::Overloaded;
     my (undef) = ($z x 1);
     my (undef) = ($z . '');
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 11;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`+`', [0, '']];
@@ -33,7 +33,7 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     $z += 0;
     $z -= 0;
@@ -46,7 +46,7 @@ use Test::LazyMock::Overloaded;
     $z x= 1;
     $z .= '';
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 11;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`+=`', [0, undef]];
@@ -62,7 +62,7 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = ($z < 0);
     my (undef) = ($z <= 0);
@@ -71,7 +71,7 @@ use Test::LazyMock::Overloaded;
     my (undef) = ($z == 0);
     my (undef) = ($z != 0);
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 7;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`<`', [0, '']];
@@ -83,12 +83,12 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = ($z <=> 0);
     my (undef) = ($z cmp 0);
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 3;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`<=>`', [0, '']];
@@ -96,7 +96,7 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = ($z lt '');
     my (undef) = ($z le '');
@@ -105,7 +105,7 @@ use Test::LazyMock::Overloaded;
     my (undef) = ($z eq '');
     my (undef) = ($z ne '');
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 7;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`lt`', ['', '']];
@@ -117,7 +117,7 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = ($z & 0xff);
     my (undef) = ($z &= 0xff);
@@ -132,7 +132,7 @@ use Test::LazyMock::Overloaded;
     # my (undef) = ($z ^. "\x00");
     # my (undef) = ($z ^.= "\x00");
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 7;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`&`', [0xff, '']];
@@ -150,14 +150,14 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = - $z;
     my (undef) = ! $z;
     my (undef) = ~ $z;
     # my (undef) = ~. $z;
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 4;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`neg`', [undef, '']];
@@ -167,12 +167,12 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     ++$z;
     --$z;
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 3;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`++`', [undef, '']];
@@ -180,7 +180,7 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = (atan2 $z, 1);
     my (undef) = (cos $z);
@@ -191,7 +191,7 @@ use Test::LazyMock::Overloaded;
     my (undef) = (sqrt $z);
     my (undef) = (int $z);
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 9;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`atan2`', [1, '']];
@@ -205,14 +205,14 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     ok $z ? 1 : 0;
-    like "$z", qr/\bLazyMock\b/;
+    like "$z", qr/\bAutoMock\b/;
     is sprintf('%d', $z), '1';
     is qr/$z/, qr//;
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 5;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`bool`', [undef, '']];
@@ -222,22 +222,22 @@ use Test::LazyMock::Overloaded;
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     while (<$z>) {}
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 2;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`<>`', [undef, '']];
 }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $z = $mock->z;
     my (undef) = (-e $z);
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 3;
     is_deeply $calls[0], ['z', []];
     is_deeply $calls[1], ['z->`-X`', ['e', '']];
@@ -245,18 +245,18 @@ use Test::LazyMock::Overloaded;
 }
 
 # {
-#     my $mock = Test::LazyMock::Overloaded->new;
+#     my $mock = Test::AutoMock::Overloaded->new;
 #     my $z = $mock->z;
 #     my (undef) = ($z ~~ [1, 2, 3]);
 
-#     my @calls = $mock->lazymock_calls;
+#     my @calls = $mock->automock_calls;
 #     is @calls, 2;
 #     is_deeply $calls[0], ['z', []];
 #     is_deeply $calls[1], ['z->`~~`', ['1', '']];
 # }
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $any_ref = $mock->get_ref;
     is $$any_ref, undef;
     is_deeply \@$any_ref, [];
@@ -264,7 +264,7 @@ use Test::LazyMock::Overloaded;
     is ref \*$any_ref, 'GLOB';
     is_deeply \%$any_ref, {};
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 7;
     is_deeply $calls[0], ['get_ref', []];
     is_deeply $calls[1], ['get_ref->`${}`', [undef, '']];
@@ -277,7 +277,7 @@ use Test::LazyMock::Overloaded;
 
 {
     # a difference between + and +=, ++
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $n = $mock->n;
     my $m = $n + 1;
     $n += 1;
@@ -285,7 +285,7 @@ use Test::LazyMock::Overloaded;
     is sprintf('%d', $n), '1';
     is sprintf('%d', $m), '1';
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 6;
     is_deeply $calls[0], ['n', []];
     is_deeply $calls[1], ['n->`+`', [1, '']];

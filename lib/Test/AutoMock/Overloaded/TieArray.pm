@@ -1,4 +1,4 @@
-package Test::LazyMock::Overloaded::TieArray;
+package Test::AutoMock::Overloaded::TieArray;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);
@@ -25,7 +25,7 @@ sub FETCH {
 
     $lazy_mock->_call_method($method_name, [], sub {
         my $self = shift;
-        $arrayref->[$key] = $self->lazymock_child($method_name)
+        $arrayref->[$key] = $self->automock_child($method_name)
                                                unless exists $arrayref->[$key];
         $arrayref->[$key];
     });
@@ -158,3 +158,33 @@ sub EXISTS {
 
 1;
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::AutoMock::Overloaded::TieArray - Track operations to array-ref
+
+=head1 DESCRIPTION
+
+This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
+array-refs. You won't instantiate this class.
+
+For the sake of simplicity, we use the notation C<[index]> for C<FETCH> and
+C<STORE>. For other tie methods, record with the original name.
+
+See https://perldoc.perl.org/perltie.html#Tying-Arrays .
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Honma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Masahiro Honma E<lt>hiratara@cpan.orgE<gt>
+
+=cut
+

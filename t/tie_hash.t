@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok eq_set is is_deeply done_testing)];
-use Test::LazyMock::Overloaded;
+use Test::AutoMock::Overloaded;
 
 {
-    my $mock = Test::LazyMock::Overloaded->new;
+    my $mock = Test::AutoMock::Overloaded->new;
     my $hash = $mock->ref_hash;
 
     # FETCh
@@ -32,7 +32,7 @@ use Test::LazyMock::Overloaded;
 
     is scalar %$hash, 2;
 
-    my @calls = $mock->lazymock_calls;
+    my @calls = $mock->automock_calls;
     is @calls, 16;
     is_deeply $calls[0], ['ref_hash', []];
     is_deeply $calls[1], ['ref_hash->{abc}', []];

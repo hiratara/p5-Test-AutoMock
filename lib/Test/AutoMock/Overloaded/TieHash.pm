@@ -1,4 +1,4 @@
-package Test::LazyMock::Overloaded::TieHash;
+package Test::AutoMock::Overloaded::TieHash;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);
@@ -25,7 +25,7 @@ sub FETCH {
 
     $lazy_mock->_call_method($method_name, [], sub {
         my $self = shift;
-        $hashref->{$key} = $self->lazymock_child($method_name)
+        $hashref->{$key} = $self->automock_child($method_name)
                                                 unless exists $hashref->{$key};
         $hashref->{$key};
     });
@@ -115,3 +115,33 @@ sub SCALAR {
 
 1;
 __END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::AutoMock::Overloaded::TieHash - Track operations to hash-ref
+
+=head1 DESCRIPTION
+
+This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
+hash-refs. You won't instantiate this class.
+
+For the sake of simplicity, we use the notation C<{key}> for C<FETCH> and
+C<STORE>. For other tie methods, record with the original name.
+
+See https://perldoc.perl.org/perltie.html#Tying-Hashes .
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Honma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Masahiro Honma E<lt>hiratara@cpan.orgE<gt>
+
+=cut
+
