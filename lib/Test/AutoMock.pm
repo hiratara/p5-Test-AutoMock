@@ -20,6 +20,7 @@ sub new {
         _lazymock_parent => $params{parent},
         _lazymock_children => {},  # name => instance
         _lazymock_calls => [],
+        _lazymock_allow_any_method => !! $params{allow_any_method},
     };
     # avoid cyclic reference
     weaken($self_fields->{_lazymock_parent});
@@ -197,9 +198,20 @@ sub _record_call {
     }
 }
 
+sub _assert_reserved_methods {
+    my ($self, $meth) = @_;
+
+    die "The name \"$meth\" is reserved. " .
+        'Enable allow_any_method if you want to do.'
+        if $meth =~ qr/^(?:automock_|_)/;
+}
+
 sub _call_method {
     my ($self, $meth, $ref_params, $default_handler) = @_;
     my $self_fields = $self->_get_fields;
+
+    $self->_assert_reserved_methods($meth)
+        unless $self_fields->{_lazymock_allow_any_method};
 
     $default_handler //= sub {
         my $self = shift;
@@ -318,6 +330,12 @@ A hash-ref of method definitions. See L<automock_add_method>.
 
 A super class of this mock. See L<automock_isa>.
 To specify multiple classes, use array-ref.
+
+=item allow_any_method
+
+AutoMock reserves methods prefixed by "automock_" or "_", and you can not call
+them. If you set allow_any_method true value, you can call them if AutoMock
+doesn't use them yet.
 
 =back
 
