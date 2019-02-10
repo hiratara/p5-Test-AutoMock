@@ -289,6 +289,11 @@ AutoMock, check L<Test::AutoMock::Patch>.
 
 Test::AutoMock is inspired by Python3's unittest.mock module.
 
+=head1 ALPHA WARNING
+
+This module is under development. The API, including names of classes and
+methods, may be subject to BACKWARD INCOMPATIBLE CHANGES.
+
 =head1 METHODS
 
 =head2 new
