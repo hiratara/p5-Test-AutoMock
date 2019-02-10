@@ -33,7 +33,7 @@ use Test::AutoMock;
 
 {
     isa_ok 'Test::AutoMock', 'Test::AutoMock', 'reflexive property';
-    ok ! Test::AutoMock->isa('Hoge'), 'LazyMOck is not a Hoge class';
+    ok ! Test::AutoMock->isa('Hoge'), 'AutoMock is not a Hoge class';
 }
 
 done_testing;
