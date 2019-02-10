@@ -87,6 +87,12 @@ Constructor of AutoMock. It takes the following parameters.
     A super class of this mock. See [automock\_isa](https://metacpan.org/pod/automock_isa).
     To specify multiple classes, use array-ref.
 
+- allow\_any\_method
+
+    AutoMock reserves methods prefixed by "automock\_" or "\_", and you can not call
+    them. If you set allow\_any\_method true value, you can call them if AutoMock
+    doesn't use them yet.
+
 ## automock\_add\_method
 
     $mock->automock_add_method(add_one => sub { $_[0] + 1 });
