@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "A mock that can be used with a minimum setup",
    "author" : [
       "Masahiro Honma <hiratara@cpan.org>"
    ],
@@ -55,13 +55,13 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/hiratara/p5-Test-LazyMock/issues"
+         "web" : "https://github.com/hiratara/p5-Test-AutoMock/issues"
       },
-      "homepage" : "https://github.com/hiratara/p5-Test-LazyMock",
+      "homepage" : "https://github.com/hiratara/p5-Test-AutoMock",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/hiratara/p5-Test-LazyMock.git",
-         "web" : "https://github.com/hiratara/p5-Test-LazyMock"
+         "url" : "git://github.com/hiratara/p5-Test-AutoMock.git",
+         "web" : "https://github.com/hiratara/p5-Test-AutoMock"
       }
    },
    "version" : "0.01",
