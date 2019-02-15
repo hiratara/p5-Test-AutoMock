@@ -38,26 +38,6 @@ use overload (
     fallback => 0,
 );
 
-# use Test::AutoMock::Overloaded::TieArray;
-# use Test::AutoMock::Overloaded::TieHash;
-
-# sub new {
-#     my $class = shift;
-#     my $self = $class->SUPER::new(@_);
-#     my $self_fields = $self->_get_fields;
-
-#     $self_fields->{_lazymock_tie_hash} = do {
-#         tie my %h, 'Test::AutoMock::Overloaded::TieHash', $self;
-#         \%h;
-#     };
-#     $self_fields->{_lazymock_tie_array} = do {
-#         tie my @arr, 'Test::AutoMock::Overloaded::TieArray', $self;
-#         \@arr;
-#     };
-
-#     $self;
-# }
-
 1;
 __END__
 
