@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::AutoMock;
+use Test::AutoMock qw(mock manager);
 use Test::More import => [qw(is note done_testing)];
 
 # a black box function you want to test
@@ -16,7 +16,7 @@ sub get_metacpan {
 }
 
 # build and set up the mock
-my $mock_ua = Test::AutoMock->new(
+my $mock_ua = mock(
     methods => {
         # implement only the method you are interested in
         'get->decoded_content' => "Hello, metacpan!\n",
@@ -28,11 +28,11 @@ my $body = get_metacpan($mock_ua);
 
 # then, assertion
 is $body, "Hello, metacpan!\n";
-$mock_ua->automock_called_with_ok('get->is_success' => []);
-$mock_ua->automock_not_called_ok('get->status_line');
+manager($mock_ua)->called_with_ok('get->is_success' => []);
+manager($mock_ua)->not_called_ok('get->status_line');
 
 # print all recorded calls
-for ($mock_ua->automock_calls) {
+for (manager($mock_ua)->calls) {
     my ($method, $args) = @$_;
     note "$method(" . join(', ', @$args) . ")";
 }

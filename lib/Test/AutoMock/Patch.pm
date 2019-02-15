@@ -2,7 +2,7 @@ package Test::AutoMock::Patch;
 use strict;
 use warnings;
 use Exporter qw(import);
-use Test::AutoMock::Overloaded;
+use Test::AutoMock qw(mock_overloaded);
 
 our @EXPORT_OK = qw(patch_sub);
 
@@ -10,7 +10,7 @@ sub _patch_sub_one {
     my ($code, $subroutines, $mocks) = @_;
     my ($subroutine, @left_subroutines) = @$subroutines;
 
-    my $mock = Test::AutoMock::Overloaded->new;
+    my $mock = mock_overloaded;
     my @new_mocks = (@$mocks, $mock);
 
     no strict 'refs';

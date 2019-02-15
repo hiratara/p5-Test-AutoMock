@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(is like done_testing)];
-use Test::AutoMock;
+use Test::AutoMock qw(mock);
 
 {
-    my $mock = Test::AutoMock->new;
+    my $mock = mock;
 
     my $ret_invalid = eval { $mock->automock_hoge; 1 };
     like $@, qr/"automock_hoge" is reserved/;
@@ -16,7 +16,7 @@ use Test::AutoMock;
 }
 
 {
-    my $mock = Test::AutoMock->new(
+    my $mock = mock(
         allow_any_method => 1,
     );
 

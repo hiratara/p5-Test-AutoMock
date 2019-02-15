@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 use Test::Tester import => [qw(check_tests)]; # must be used at first
-use Test::AutoMock::Overloaded;
+use Test::AutoMock qw(mock_overloaded manager);
 use Test::More import => [qw(done_testing)];
 
-my $mock = Test::AutoMock::Overloaded->new;
+my $mock = mock_overloaded;
 $mock->hoge(1, 2);
 
-check_tests sub { $mock->automock_called_with_ok(hoge => [2, 1]) },
+check_tests sub { manager($mock)->called_with_ok(hoge => [2, 1]) },
     [
         {
             ok => 0,
@@ -16,7 +16,7 @@ check_tests sub { $mock->automock_called_with_ok(hoge => [2, 1]) },
         },
     ];
 
-check_tests sub { $mock->automock_called_ok('foo') },
+check_tests sub { manager($mock)->called_ok('foo') },
     [
         {
             ok => 0,
@@ -25,7 +25,7 @@ check_tests sub { $mock->automock_called_ok('foo') },
         },
     ];
 
-check_tests sub { $mock->automock_not_called_ok('hoge') },
+check_tests sub { manager($mock)->not_called_ok('hoge') },
     [
         {
             ok => 0,

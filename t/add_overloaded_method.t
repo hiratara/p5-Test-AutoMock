@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 use Test::More import => [qw(is is_deeply done_testing)];
-use Test::AutoMock::Overloaded;
+use Test::AutoMock qw(mock_overloaded manager);
 
-my $mock = Test::AutoMock::Overloaded->new(
+my $mock = mock_overloaded(
     methods => {
         'hoge->{bar}->[3]' => sub { 3 },
         'hoge->[2]->{boo}' => 'boo',
@@ -11,7 +11,7 @@ my $mock = Test::AutoMock::Overloaded->new(
     },
 );
 
-is_deeply [$mock->automock_calls], [],
+is_deeply [manager($mock)->calls], [],
           q(hasn't been called any methods yet);
 
 is sprintf('%d', $mock->hoge->{bar}[3]), '3';

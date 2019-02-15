@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Test::AutoMock qw(manager);
 use Test::AutoMock::Patch qw(patch_sub);
 use Test::More import => [qw(is done_testing)];
 
@@ -20,15 +21,15 @@ patch_sub {
     my $mock = shift;
 
     # set up the mock
-    $mock->automock_add_method('get->decoded_content' => "Hello, metacpan!\n");
+    manager($mock)->add_method('get->decoded_content' => "Hello, metacpan!\n");
 
     # call blackbox function
     my $body = get_metacpan();
 
     # assertions
     is $body, "Hello, metacpan!\n";
-    $mock->automock_called_with_ok('get->is_success' => []);
-    $mock->automock_not_called_ok('get->status_line');
+    manager($mock)->called_with_ok('get->is_success' => []);
+    manager($mock)->not_called_ok('get->status_line');
 } 'LWP::UserAgent::new';
 
 done_testing;

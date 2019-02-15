@@ -1,4 +1,4 @@
-package Test::AutoMock::Overloaded::TieHash;
+package Test::AutoMock::Proxy::TieHash;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);
@@ -25,7 +25,7 @@ sub FETCH {
 
     $lazy_mock->_call_method($method_name, [], sub {
         my $self = shift;
-        $hashref->{$key} = $self->automock_child($method_name)
+        $hashref->{$key} = $self->child($method_name)->proxy
                                                 unless exists $hashref->{$key};
         $hashref->{$key};
     });
