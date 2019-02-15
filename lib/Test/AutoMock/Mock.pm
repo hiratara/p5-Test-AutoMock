@@ -21,7 +21,6 @@ sub new {
         parent => $params{parent},
         children => {},  # name => instance
         calls => [],
-        allow_any_method => !! $params{allow_any_method},
         proxy_class => $params{proxy_class} // 'Test::AutoMock::Proxy::Basic',
         proxy => undef,
         tie_hash => undef,
@@ -175,19 +174,8 @@ sub _record_call {
     }
 }
 
-sub _assert_reserved_methods {
-    my ($self, $meth) = @_;
-
-    die "The name \"$meth\" is reserved. " .
-        'Enable allow_any_method if you want to do.'
-        if $meth =~ qr/^(?:automock_|_)/;
-}
-
 sub _call_method {
     my ($self, $meth, $ref_params, $default_handler) = @_;
-
-    $self->_assert_reserved_methods($meth)
-        unless $self->{allow_any_method};
 
     $default_handler //= sub {
         my $self = shift;
@@ -450,12 +438,6 @@ A hash-ref of method definitions. See L<automock_add_method>.
 
 A super class of this mock. See L<automock_isa>.
 To specify multiple classes, use array-ref.
-
-=item allow_any_method
-
-AutoMock reserves methods prefixed by "automock_" or "_", and you can not call
-them. If you set allow_any_method true value, you can call them if AutoMock
-doesn't use them yet.
 
 =back
 
