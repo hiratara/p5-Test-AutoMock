@@ -39,8 +39,6 @@ sub new {
         $self->isa(@args);
     }
 
-    $self->{proxy} = $self->_new_proxy;
-
     $self->{tie_hash} = do {
         tie my %h, 'Test::AutoMock::Proxy::TieHash', $self;
         \%h;
@@ -195,7 +193,15 @@ sub _call_method {
 
 sub proxy {
     my $self = shift;
-    $self->{proxy};
+    my $proxy = $self->{proxy};
+
+    unless (defined $proxy) {
+        $proxy = $self->_new_proxy;
+        # avoid cyclic reference
+        weaken($self->{proxy} = $proxy);
+    }
+
+    $proxy;
 }
 
 sub _new_proxy {
