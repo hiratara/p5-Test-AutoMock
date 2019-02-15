@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use Scalar::Util qw(blessed refaddr weaken);
 use Test::AutoMock::Proxy::Basic;
+use Test::AutoMock::Proxy::Functions qw(new_proxy);
 use Test::AutoMock::Proxy::Overloaded;
 use Test::AutoMock::Proxy::TieArray;
 use Test::AutoMock::Proxy::TieHash;
-use Test::AutoMock::ProxyStore qw(%Proxy_To_Manager);
 use Test::More import => [qw(ok eq_array)];
 
 sub new {
@@ -195,20 +195,10 @@ sub proxy {
     my $proxy = $self->{proxy};
 
     unless (defined $proxy) {
-        $proxy = $self->_new_proxy;
+        $proxy = new_proxy($self);
         # avoid cyclic reference
         weaken($self->{proxy} = $proxy);
     }
-
-    $proxy;
-}
-
-sub _new_proxy {
-    my $self = shift;
-
-    my $proxy = bless \ my $dummy, $self->{proxy_class};
-
-    $Proxy_To_Manager{refaddr $proxy} = $self;
 
     $proxy;
 }

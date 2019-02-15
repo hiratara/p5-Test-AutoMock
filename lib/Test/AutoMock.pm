@@ -5,7 +5,7 @@ use warnings;
 use Exporter qw(import);
 use Scalar::Util qw(refaddr);
 use Test::AutoMock::Mock;
-use Test::AutoMock::ProxyStore qw(%Proxy_To_Manager);
+use Test::AutoMock::Proxy::Functions qw(get_manager);
 
 our $VERSION = "0.01";
 
@@ -26,7 +26,7 @@ sub mock_overloaded {
 
 sub manager ($) {
     my $proxy = shift;
-    $Proxy_To_Manager{refaddr $proxy} or die;
+    get_manager $proxy;
 }
 
 1;

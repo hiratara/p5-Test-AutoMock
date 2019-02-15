@@ -3,36 +3,36 @@ use strict;
 use warnings;
 use parent qw(Test::AutoMock::Proxy::Basic);
 use Scalar::Util ();
-use Test::AutoMock::ProxyStore qw(%Proxy_To_Manager);
+use Test::AutoMock::Proxy::Functions qw(get_manager);
 use overload (
     '${}' => sub {
         my $self = shift;
-        my $manager = $Proxy_To_Manager{Scalar::Util::refaddr $self};
+        my $manager = get_manager $self;
         $manager->_overload_nomethod(@_, '${}')
     },
     '@{}' => sub {
         my $self = shift;
-        my $manager = $Proxy_To_Manager{Scalar::Util::refaddr $self};
+        my $manager = get_manager $self;
         $manager->_deref_array(@_)
     },
     '%{}' => sub {
         my $self = shift;
-        my $manager = $Proxy_To_Manager{Scalar::Util::refaddr $self};
+        my $manager = get_manager $self;
         $manager->_deref_hash(@_)
     },
     '&{}' => sub {
         my $self = shift;
-        my $manager = $Proxy_To_Manager{Scalar::Util::refaddr $self};
+        my $manager = get_manager $self;
         $manager->_deref_code(@_)
     },
     '*{}' => sub {
         my $self = shift;
-        my $manager = $Proxy_To_Manager{Scalar::Util::refaddr $self};
+        my $manager = get_manager $self;
         $manager->_overload_nomethod(@_, '*{}')
     },
     nomethod => sub {
         my $self = shift;
-        my $manager = $Proxy_To_Manager{Scalar::Util::refaddr $self};
+        my $manager = get_manager $self;
         $manager->_overload_nomethod(@_);
     },
     fallback => 0,
