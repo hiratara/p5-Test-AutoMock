@@ -176,7 +176,6 @@ sub _call_method {
     my ($self, $meth, $ref_params, $default_handler) = @_;
 
     $default_handler //= sub {
-        my $self = shift;
         my $child_manager = $self->child($meth);
         $child_manager->proxy;
     };
@@ -187,7 +186,7 @@ sub _call_method {
     if (my $code = $self->{methods}{$meth}) {
         $code->(@$ref_params);
     } else {
-        $self->$default_handler(@$ref_params);
+        $self->proxy->$default_handler(@$ref_params);
     }
 }
 
@@ -226,16 +225,16 @@ my %default_overload_handlers = (
     'x' => undef,
     '.' => undef,
 
-    '+=' => sub { $_[0]->proxy },
-    '-=' => sub { $_[0]->proxy },
-    '*=' => sub { $_[0]->proxy },
-    '/=' => sub { $_[0]->proxy },
-    '%=' => sub { $_[0]->proxy },
-    '**=' => sub { $_[0]->proxy },
-    '<<=' => sub { $_[0]->proxy },
-    '>>=' => sub { $_[0]->proxy },
-    'x=' => sub { $_[0]->proxy },
-    '.=' => sub { $_[0]->proxy },
+    '+=' => sub { $_[0] },
+    '-=' => sub { $_[0] },
+    '*=' => sub { $_[0] },
+    '/=' => sub { $_[0] },
+    '%=' => sub { $_[0] },
+    '**=' => sub { $_[0] },
+    '<<=' => sub { $_[0] },
+    '>>=' => sub { $_[0] },
+    'x=' => sub { $_[0] },
+    '.=' => sub { $_[0] },
 
     '<' => undef,
     '<=' => undef,
@@ -255,11 +254,11 @@ my %default_overload_handlers = (
     'ne' => undef,
 
     '&' => undef,
-    '&=' => sub { $_[0]->proxy },
+    '&=' => sub { $_[0] },
     '|' => undef,
-    '|=' => sub { $_[0]->proxy },
+    '|=' => sub { $_[0] },
     '^' => undef,
-    '^=' => sub { $_[0]->proxy },
+    '^=' => sub { $_[0] },
     # '&.' => undef,
     # '&.=' => sub { $_[0] },
     # '|.' => undef,
@@ -272,8 +271,8 @@ my %default_overload_handlers = (
     '~' => undef,
     # '~.' => sub { $_[0] },
 
-    '++' => sub { $_[0]->proxy },
-    '--' => sub { $_[0]->proxy },
+    '++' => sub { $_[0] },
+    '--' => sub { $_[0] },
 
     'atan2' => undef,
     'cos' => undef,
@@ -286,7 +285,7 @@ my %default_overload_handlers = (
 
     'bool' => sub { !! 1 },
     '""' => sub {
-        my $proxy = shift->proxy;
+        my $proxy = shift;
         sprintf "%s(0x%x)", blessed $proxy, refaddr $proxy;
     },
     '0+' => sub { 1 },

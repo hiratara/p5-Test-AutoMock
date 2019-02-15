@@ -25,7 +25,7 @@ sub FETCH {
 
     $lazy_mock->_call_method($method_name, [], sub {
         my $self = shift;
-        $hashref->{$key} = $self->child($method_name)->proxy
+        $hashref->{$key} = $lazy_mock->child($method_name)->proxy
                                                 unless exists $hashref->{$key};
         $hashref->{$key};
     });
