@@ -8,32 +8,32 @@ use overload (
     '${}' => sub {
         my $self = shift;
         my $manager = get_manager $self;
-        $manager->_overload_nomethod(@_, '${}')
+        $manager->_overload_nomethod($self, @_, '${}')
     },
     '@{}' => sub {
         my $self = shift;
         my $manager = get_manager $self;
-        $manager->_deref_array(@_)
+        $manager->_deref_array($self, @_)
     },
     '%{}' => sub {
         my $self = shift;
         my $manager = get_manager $self;
-        $manager->_deref_hash(@_)
+        $manager->_deref_hash($self, @_)
     },
     '&{}' => sub {
         my $self = shift;
         my $manager = get_manager $self;
-        $manager->_deref_code(@_)
+        $manager->_deref_code($self, @_)
     },
     '*{}' => sub {
         my $self = shift;
         my $manager = get_manager $self;
-        $manager->_overload_nomethod(@_, '*{}')
+        $manager->_overload_nomethod($self, @_, '*{}')
     },
     nomethod => sub {
         my $self = shift;
         my $manager = get_manager $self;
-        $manager->_overload_nomethod(@_);
+        $manager->_overload_nomethod($self, @_);
     },
     fallback => 0,
 );

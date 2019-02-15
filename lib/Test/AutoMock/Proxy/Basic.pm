@@ -24,7 +24,7 @@ sub AUTOLOAD {
     (my $meth = our $AUTOLOAD) =~ s/.*:://;
 
     my $manager = get_manager $self;
-    $manager->_call_method($meth => \@params, undef);
+    $manager->_call_method($self, $meth => \@params, undef);
 }
 
 1;

@@ -23,7 +23,7 @@ sub FETCH {
     my ($hashref, $lazy_mock) = @$self;
     my $method_name = "{$key}";
 
-    $lazy_mock->_call_method($method_name, [], sub {
+    $lazy_mock->_call_method($self, $method_name, [], sub {
         my $self = shift;
         $hashref->{$key} = $lazy_mock->child($method_name)->proxy
                                                 unless exists $hashref->{$key};
@@ -35,7 +35,7 @@ sub STORE {
     my ($self, $key, $value) = @_;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method("{$key}", [$value], sub {
+    $lazy_mock->_call_method($self, "{$key}", [$value], sub {
         my ($self, $value) = @_;
         $hashref->{$key} = $value;
     });
@@ -45,7 +45,7 @@ sub DELETE {
     my ($self, $key) = @_;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method("DELETE", [$key], sub {
+    $lazy_mock->_call_method($self, "DELETE", [$key], sub {
         my ($self, $key) = @_;
         delete $hashref->{$key};
     });
@@ -55,7 +55,7 @@ sub CLEAR {
     my $self = shift;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method("CLEAR", [], sub {
+    $lazy_mock->_call_method($self, "CLEAR", [], sub {
         my $self = shift;
         %$hashref = ();
     });
@@ -65,7 +65,7 @@ sub EXISTS {
     my ($self, $key) = @_;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method('EXISTS', [$key], sub {
+    $lazy_mock->_call_method($self, 'EXISTS', [$key], sub {
         my ($self, $key) = @_;
         exists $hashref->{$key};
     });
@@ -75,7 +75,7 @@ sub FIRSTKEY {
     my $self = shift;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method('FIRSTKEY', [], sub {
+    $lazy_mock->_call_method($self, 'FIRSTKEY', [], sub {
         my $self = shift;
         keys %$hashref;  # reset each() iterator
         each %$hashref;
@@ -86,7 +86,7 @@ sub NEXTKEY {
     my ($self, $lastkey) = @_;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method('NEXTKEY', [$lastkey], sub {
+    $lazy_mock->_call_method($self, 'NEXTKEY', [$lastkey], sub {
         my $self = shift;
         each %$hashref;
     });
@@ -96,7 +96,7 @@ sub SCALAR {
     my $self = shift;
     my ($hashref, $lazy_mock) = @$self;
 
-    $lazy_mock->_call_method('SCALAR', [], sub {
+    $lazy_mock->_call_method($self, 'SCALAR', [], sub {
         my $self = shift;
         scalar %$hashref;
     });

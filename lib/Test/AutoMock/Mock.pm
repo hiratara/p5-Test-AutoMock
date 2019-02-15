@@ -173,7 +173,7 @@ sub _record_call {
 }
 
 sub _call_method {
-    my ($self, $meth, $ref_params, $default_handler) = @_;
+    my ($self, $proxy, $meth, $ref_params, $default_handler) = @_;
 
     $default_handler //= sub {
         my $child_manager = $self->child($meth);
@@ -186,7 +186,7 @@ sub _call_method {
     if (my $code = $self->{methods}{$meth}) {
         $code->(@$ref_params);
     } else {
-        $self->proxy->$default_handler(@$ref_params);
+        $proxy->$default_handler(@$ref_params);
     }
 }
 
@@ -292,10 +292,10 @@ my %default_overload_handlers = (
 );
 
 sub _overload_nomethod {
-    my ($self, $other, $is_swapped, $operator, $is_numeric) = @_;
+    my ($self, $proxy, $other, $is_swapped, $operator, $is_numeric) = @_;
 
     # don't record the call of copy constructor (and don't copy mocks)
-    return $self->proxy if $operator eq '=';
+    return $proxy if $operator eq '=';
 
     my $operator_name = "`$operator`";
     my $default_handler;
@@ -306,13 +306,13 @@ sub _overload_nomethod {
     }
 
     $self->_call_method(
-        $operator_name => [$other, $is_swapped],
+        $proxy, $operator_name => [$other, $is_swapped],
         $default_handler,
     );
 }
 
 sub _deref_hash {
-    my $self = shift;
+    my ($self, $proxy) = @_;
 
     # don't record `%{}` calls
 
@@ -320,7 +320,7 @@ sub _deref_hash {
 }
 
 sub _deref_array {
-    my $self = shift;
+    my ($self, $proxy) = @_;
 
     # don't record `@{}` calls
 
@@ -328,13 +328,13 @@ sub _deref_array {
 }
 
 sub _deref_code {
-    my $self = shift;
+    my ($self, $proxy) = @_;
 
     # don't record `&{}` calls
 
     sub {
         my @args = @_;
-        $self->_call_method('()', [@_], undef);
+        $self->_call_method($proxy, '()', [@_], undef);
     };
 }
 
