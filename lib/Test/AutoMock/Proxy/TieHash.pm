@@ -4,28 +4,28 @@ use warnings;
 use Scalar::Util qw(weaken);
 
 sub new {
-    my ($class, $lazy_mock) = @_;
+    my ($class, $manager) = @_;
 
-    my $self = [{}, $lazy_mock];
+    my $self = [{}, $manager];
     weaken($self->[1]);  # avoid cyclic reference
 
     bless $self => $class;
 }
 
 sub TIEHASH {
-    my ($class, $lazy_mock) = @_;
+    my ($class, $manager) = @_;
 
-    $class->new($lazy_mock);
+    $class->new($manager);
 }
 
 sub FETCH {
     my ($self, $key) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
     my $method_name = "{$key}";
 
-    $lazy_mock->_call_method($self, $method_name, [], sub {
+    $manager->_call_method($self, $method_name, [], sub {
         my $self = shift;
-        $hashref->{$key} = $lazy_mock->child($method_name)->proxy
+        $hashref->{$key} = $manager->child($method_name)->proxy
                                                 unless exists $hashref->{$key};
         $hashref->{$key};
     });
@@ -33,9 +33,9 @@ sub FETCH {
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, "{$key}", [$value], sub {
+    $manager->_call_method($self, "{$key}", [$value], sub {
         my ($self, $value) = @_;
         $hashref->{$key} = $value;
     });
@@ -43,9 +43,9 @@ sub STORE {
 
 sub DELETE {
     my ($self, $key) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, "DELETE", [$key], sub {
+    $manager->_call_method($self, "DELETE", [$key], sub {
         my ($self, $key) = @_;
         delete $hashref->{$key};
     });
@@ -53,9 +53,9 @@ sub DELETE {
 
 sub CLEAR {
     my $self = shift;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, "CLEAR", [], sub {
+    $manager->_call_method($self, "CLEAR", [], sub {
         my $self = shift;
         %$hashref = ();
     });
@@ -63,9 +63,9 @@ sub CLEAR {
 
 sub EXISTS {
     my ($self, $key) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'EXISTS', [$key], sub {
+    $manager->_call_method($self, 'EXISTS', [$key], sub {
         my ($self, $key) = @_;
         exists $hashref->{$key};
     });
@@ -73,9 +73,9 @@ sub EXISTS {
 
 sub FIRSTKEY {
     my $self = shift;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'FIRSTKEY', [], sub {
+    $manager->_call_method($self, 'FIRSTKEY', [], sub {
         my $self = shift;
         keys %$hashref;  # reset each() iterator
         each %$hashref;
@@ -84,9 +84,9 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
     my ($self, $lastkey) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'NEXTKEY', [$lastkey], sub {
+    $manager->_call_method($self, 'NEXTKEY', [$lastkey], sub {
         my $self = shift;
         each %$hashref;
     });
@@ -94,9 +94,9 @@ sub NEXTKEY {
 
 sub SCALAR {
     my $self = shift;
-    my ($hashref, $lazy_mock) = @$self;
+    my ($hashref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'SCALAR', [], sub {
+    $manager->_call_method($self, 'SCALAR', [], sub {
         my $self = shift;
         scalar %$hashref;
     });

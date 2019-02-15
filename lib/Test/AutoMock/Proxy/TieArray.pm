@@ -4,28 +4,28 @@ use warnings;
 use Scalar::Util qw(weaken);
 
 sub new {
-    my ($class, $lazy_mock) = @_;
+    my ($class, $manager) = @_;
 
-    my $self = [[], $lazy_mock];
+    my $self = [[], $manager];
     weaken($self->[1]);  # avoid cyclic reference
 
     bless $self => $class;
 }
 
 sub TIEARRAY {
-    my ($class, $lazy_mock) = @_;
+    my ($class, $manager) = @_;
 
-    $class->new($lazy_mock);
+    $class->new($manager);
 }
 
 sub FETCH {
     my ($self, $key) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
     my $method_name = "[$key]";
 
-    $lazy_mock->_call_method($self, $method_name, [], sub {
+    $manager->_call_method($self, $method_name, [], sub {
         my $self = shift;
-        $arrayref->[$key] = $lazy_mock->child($method_name)->proxy
+        $arrayref->[$key] = $manager->child($method_name)->proxy
                                                unless exists $arrayref->[$key];
         $arrayref->[$key];
     });
@@ -33,9 +33,9 @@ sub FETCH {
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, "[$key]", [$value], sub {
+    $manager->_call_method($self, "[$key]", [$value], sub {
         my ($self, $value) = @_;
         $arrayref->[$key] = $value;
     });
@@ -43,9 +43,9 @@ sub STORE {
 
 sub FETCHSIZE {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'FETCHSIZE', [], sub {
+    $manager->_call_method($self, 'FETCHSIZE', [], sub {
         my $self = shift;
         $#$arrayref + 1;
     });
@@ -53,9 +53,9 @@ sub FETCHSIZE {
 
 sub STORESIZE {
     my ($self, $count) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'STORESIZE', [$count], sub {
+    $manager->_call_method($self, 'STORESIZE', [$count], sub {
         my ($self, $count) = @_;
         $#$arrayref = $count - 1;
     });
@@ -63,9 +63,9 @@ sub STORESIZE {
 
 sub CLEAR {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'CLEAR', [], sub {
+    $manager->_call_method($self, 'CLEAR', [], sub {
         my $self = shift;
         @$arrayref = ();
     });
@@ -73,9 +73,9 @@ sub CLEAR {
 
 sub PUSH {
     my ($self, @list) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'PUSH', \@list, sub {
+    $manager->_call_method($self, 'PUSH', \@list, sub {
         my ($self, @list) = @_;
         push @$arrayref, @list;
     });
@@ -83,9 +83,9 @@ sub PUSH {
 
 sub POP {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'POP', [], sub {
+    $manager->_call_method($self, 'POP', [], sub {
         my $self = shift;
         pop @$arrayref;
     });
@@ -93,9 +93,9 @@ sub POP {
 
 sub SHIFT {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'SHIFT', [], sub {
+    $manager->_call_method($self, 'SHIFT', [], sub {
         my $self = shift;
         shift @$arrayref;
     });
@@ -103,9 +103,9 @@ sub SHIFT {
 
 sub UNSHIFT {
     my ($self, @list) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'UNSHIFT', \@list, sub {
+    $manager->_call_method($self, 'UNSHIFT', \@list, sub {
         my ($self, @list) = @_;
         unshift @$arrayref, @list;
     });
@@ -113,9 +113,9 @@ sub UNSHIFT {
 
 sub SPLICE {
     my ($self, $offset, $length, @list) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'SPLICE', [$offset, $length, @list], sub {
+    $manager->_call_method($self, 'SPLICE', [$offset, $length, @list], sub {
         my ($self, $offset, $length, @list) = @_;
         splice @$arrayref, $offset, $length, @list;
     });
@@ -128,9 +128,9 @@ sub SPLICE {
 
 sub DELETE {
     my ($self, $key) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'DELETE', [$key], sub {
+    $manager->_call_method($self, 'DELETE', [$key], sub {
         my ($self, $key) = @_;
         delete $arrayref->[$key];
     });
@@ -138,9 +138,9 @@ sub DELETE {
 
 sub EXISTS {
     my ($self, $key) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my ($arrayref, $manager) = @$self;
 
-    $lazy_mock->_call_method($self, 'EXISTS', [$key], sub {
+    $manager->_call_method($self, 'EXISTS', [$key], sub {
         my ($self, $key) = @_;
         exists $arrayref->[$key];
     });
