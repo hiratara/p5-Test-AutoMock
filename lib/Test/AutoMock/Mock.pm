@@ -21,7 +21,7 @@ sub new {
         parent => $params{parent},
         children => {},  # name => instance
         calls => [],
-        proxy_class => $params{proxy_class} // 'Test::AutoMock::Proxy::Basic',
+        proxy_class => $params{proxy_class},
         proxy => undef,
         tie_hash => undef,
         tie_array => undef,
