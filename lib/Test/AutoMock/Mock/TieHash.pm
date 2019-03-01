@@ -25,7 +25,7 @@ sub FETCH {
 
     $manager->_call_method($self, $method_name, [], sub {
         my $self = shift;
-        $hashref->{$key} = $manager->child($method_name)->proxy
+        $hashref->{$key} = $manager->child($method_name)->mock
                                                 unless exists $hashref->{$key};
         $hashref->{$key};
     });

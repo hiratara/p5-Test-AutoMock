@@ -19,7 +19,7 @@ is $mock->hoge, 10;
 is $mock->foo(100), 101;
 
 # access to child
-is manager($mock)->child('def')->proxy, $def;
+is manager($mock)->child('def')->mock, $def;
 isa_ok manager($mock)->child('jkl')->child('mno'),
        'Test::AutoMock';
 is manager($mock)->child('hoge'), undef, 'hoge returns 10 instead of a child';

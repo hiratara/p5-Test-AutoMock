@@ -4,29 +4,19 @@ use strict;
 use warnings;
 use Exporter qw(import);
 use Scalar::Util qw(refaddr);
-use Test::AutoMock::Manager;
-use Test::AutoMock::Mock::Functions qw(get_manager);
+use Test::AutoMock::Mock::Functions qw(new_mock get_manager);
 
 our $VERSION = "0.01";
 
 our @EXPORT_OK = qw(mock mock_overloaded manager);
 
-sub mock {
-    my $mock = Test::AutoMock::Manager->new(@_);
-    $mock->proxy;
-}
+sub mock { new_mock('Test::AutoMock::Mock::Basic', @_) }
 
-sub mock_overloaded {
-    my $mock = Test::AutoMock::Manager->new(
-        @_,
-        proxy_class => 'Test::AutoMock::Mock::Overloaded',
-    );
-    $mock->proxy;
-}
+sub mock_overloaded { new_mock('Test::AutoMock::Mock::Overloaded', @_) }
 
 sub manager ($) {
-    my $proxy = shift;
-    get_manager $proxy;
+    my $mock = shift;
+    get_manager $mock;
 }
 
 1;

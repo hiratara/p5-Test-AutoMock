@@ -4,22 +4,34 @@ use warnings;
 use Exporter qw(import);
 use Scalar::Util qw(blessed);
 
-our @EXPORT_OK = qw(new_proxy get_manager);
+# Load classes after @EXPORT_OK creation
+our @EXPORT_OK = qw(new_mock get_manager);
+require Test::AutoMock::Manager;
+require Test::AutoMock::Mock::Basic;
+require Test::AutoMock::Mock::Overloaded;
 
-sub new_proxy ($) {
-    my $manager = shift;
+sub new_mock ($@) {
+    my $class = shift;
 
-    my $proxy_class = $manager->{proxy_class} // 'Test::AutoMock::Mock::Basic';
-    bless \$manager, $proxy_class;
+    my $mock = bless(\ my $manager, $class);
+    $manager = Test::AutoMock::Manager->new(
+        @_,
+        mock_class => $class,
+        mock => $mock,
+    );
+
+    $mock;
 }
 
 sub get_manager ($) {
-    my $proxy = shift;
+    my $mock = shift;
 
-    my $class = blessed $proxy or die '$proxy is not an object';
-    bless $proxy, __PACKAGE__;  # disable operator overloads
-    my $deref = eval { $$proxy };
-    bless $proxy, $class;
+    my $class = blessed $mock or die '$mock is not an object';
+
+    bless $mock, __PACKAGE__ . "Dummy";  # disable operator overloads
+    my $deref = eval { $$mock };
+
+    bless $mock, $class;
     $@ and die $@;
 
     $deref;

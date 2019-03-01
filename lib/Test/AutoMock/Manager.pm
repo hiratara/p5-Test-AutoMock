@@ -2,9 +2,7 @@ package Test::AutoMock::Manager;
 use strict;
 use warnings;
 use Scalar::Util qw(blessed refaddr weaken);
-use Test::AutoMock::Mock::Basic;
-use Test::AutoMock::Mock::Functions qw(new_proxy);
-use Test::AutoMock::Mock::Overloaded;
+use Test::AutoMock::Mock::Functions qw(new_mock get_manager);
 use Test::AutoMock::Mock::TieArray;
 use Test::AutoMock::Mock::TieHash;
 use Test::More import => [qw(ok eq_array)];
@@ -21,13 +19,15 @@ sub new {
         parent => $params{parent},
         children => {},  # name => instance
         calls => [],
-        proxy_class => $params{proxy_class},
+        mock_class => $params{mock_class},
+        mock => $params{mock},
         proxy => undef,
         tie_hash => undef,
         tie_array => undef,
     } => $class;
     # avoid cyclic reference
     weaken($self->{parent});
+    weaken($self->{mock});
 
     # parse all method definitions
     while (my ($k, $v) = each %{$params{methods} // {}}) {
@@ -51,6 +51,8 @@ sub new {
 
     $self;
 }
+
+sub mock { $_[0]->{mock} }
 
 sub add_method {
     my ($self, $name, $code_or_value) = @_;
@@ -97,30 +99,33 @@ sub calls {
     @{$self->{calls}}
 }
 
-sub child {
+sub _get_child_mock {
     my ($self, $name) = @_;
 
     return if exists $self->{methods}{$name};
 
-    $self->{children}{$name} //= do {
+    $self->{children}{$name} //=
         # create new child
-        my $child_mock = ref($self)->new(
+        new_mock(
+            $self->{mock_class},
             name => $name,
-            parent => $self,
-            proxy_class => $self->{proxy_class},
+            parent => $self->mock,
         );
+}
 
-        $self->{children}{$name} = $child_mock;
+sub child {
+    my ($self, $name) = @_;
+    my $child_mock = $self->_get_child_mock($name);
 
-        $child_mock;
-    };
+    defined $child_mock ? get_manager $child_mock
+                        : undef;
 }
 
 sub reset {
     my $self = shift;
 
     $self->{calls} = [];
-    $_->reset for values %{$self->{children}};
+    (get_manager $_)->reset for values %{$self->{children}};
 }
 
 sub _find_call {
@@ -159,26 +164,25 @@ sub _record_call {
     # follow up the chain of mocks and record calls
     my %seen;
     my $cur_call = [$meth, $ref_params];
-    my $cur_mock = $self;
-    while (defined $cur_mock && ! $seen{refaddr($cur_mock)}++) {
-        push @{$cur_mock->{calls}}, $cur_call;
+    my $cur_mgr = $self;
+    while (defined $cur_mgr && ! $seen{refaddr($cur_mgr)}++) {
+        push @{$cur_mgr->{calls}}, $cur_call;
 
         my $method_name = $cur_call->[0];
-        my $parent_name = $cur_mock->{name};
+        my $parent_name = $cur_mgr->{name};
         $method_name = "$parent_name->$method_name" if defined $parent_name;
 
         $cur_call = [$method_name, $cur_call->[1]];
-        $cur_mock = $cur_mock->{parent};
+        $cur_mgr =
+            defined $cur_mgr->{parent} ? get_manager($cur_mgr->{parent})
+                                       : undef;
     }
 }
 
 sub _call_method {
-    my ($self, $proxy, $meth, $ref_params, $default_handler) = @_;
+    my ($self, $mock, $meth, $ref_params, $default_handler) = @_;
 
-    $default_handler //= sub {
-        my $child_manager = $self->child($meth);
-        $child_manager->proxy;
-    };
+    $default_handler //= sub { $self->_get_child_mock($meth) };
 
     $self->_record_call($meth, $ref_params);
 
@@ -186,21 +190,8 @@ sub _call_method {
     if (my $code = $self->{methods}{$meth}) {
         $code->(@$ref_params);
     } else {
-        $proxy->$default_handler(@$ref_params);
+        $mock->$default_handler(@$ref_params);
     }
-}
-
-sub proxy {
-    my $self = shift;
-    my $proxy = $self->{proxy};
-
-    unless (defined $proxy) {
-        $proxy = new_proxy($self);
-        # avoid cyclic reference
-        weaken($self->{proxy} = $proxy);
-    }
-
-    $proxy;
 }
 
 my %default_overload_handlers = (
