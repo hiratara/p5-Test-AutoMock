@@ -385,6 +385,11 @@ assertions.
 
 TODO: Support C<< -> >> notations.
 
+=head2 mock
+
+It returns the mock that this manager manages.
+See also L<Test::AutoMock::manager>.
+
 =head2 calls
 
     my @calls = manager($mock)->calls;
