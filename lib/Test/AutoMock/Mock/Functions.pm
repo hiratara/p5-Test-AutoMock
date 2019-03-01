@@ -28,7 +28,7 @@ sub get_manager ($) {
 
     my $class = blessed $mock or die '$mock is not an object';
 
-    bless $mock, __PACKAGE__ . "Dummy";  # disable operator overloads
+    bless $mock, __PACKAGE__ . "::Dummy";  # disable operator overloads
     my $deref = eval { $$mock };
 
     bless $mock, $class;
