@@ -1,8 +1,8 @@
-package Test::AutoMock::Proxy::Basic;
+package Test::AutoMock::Mock::Basic;
 use strict;
 use warnings;
 use Scalar::Util ();
-use Test::AutoMock::Proxy::Functions qw(get_manager);
+use Test::AutoMock::Mock::Functions qw(get_manager);
 
 sub isa {
     my $class_or_self = shift;

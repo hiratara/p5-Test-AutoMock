@@ -1,12 +1,12 @@
-package Test::AutoMock::Mock;
+package Test::AutoMock::Manager;
 use strict;
 use warnings;
 use Scalar::Util qw(blessed refaddr weaken);
-use Test::AutoMock::Proxy::Basic;
-use Test::AutoMock::Proxy::Functions qw(new_proxy);
-use Test::AutoMock::Proxy::Overloaded;
-use Test::AutoMock::Proxy::TieArray;
-use Test::AutoMock::Proxy::TieHash;
+use Test::AutoMock::Mock::Basic;
+use Test::AutoMock::Mock::Functions qw(new_proxy);
+use Test::AutoMock::Mock::Overloaded;
+use Test::AutoMock::Mock::TieArray;
+use Test::AutoMock::Mock::TieHash;
 use Test::More import => [qw(ok eq_array)];
 
 sub new {
@@ -40,12 +40,12 @@ sub new {
     }
 
     $self->{tie_hash} = do {
-        tie my %h, 'Test::AutoMock::Proxy::TieHash', $self;
+        tie my %h, 'Test::AutoMock::Mock::TieHash', $self;
         \%h;
     };
 
     $self->{tie_array} = do {
-        tie my @arr, 'Test::AutoMock::Proxy::TieArray', $self;
+        tie my @arr, 'Test::AutoMock::Mock::TieArray', $self;
         \@arr;
     };
 

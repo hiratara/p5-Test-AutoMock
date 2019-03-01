@@ -4,22 +4,22 @@ use strict;
 use warnings;
 use Exporter qw(import);
 use Scalar::Util qw(refaddr);
-use Test::AutoMock::Mock;
-use Test::AutoMock::Proxy::Functions qw(get_manager);
+use Test::AutoMock::Manager;
+use Test::AutoMock::Mock::Functions qw(get_manager);
 
 our $VERSION = "0.01";
 
 our @EXPORT_OK = qw(mock mock_overloaded manager);
 
 sub mock {
-    my $mock = Test::AutoMock::Mock->new(@_);
+    my $mock = Test::AutoMock::Manager->new(@_);
     $mock->proxy;
 }
 
 sub mock_overloaded {
-    my $mock = Test::AutoMock::Mock->new(
+    my $mock = Test::AutoMock::Manager->new(
         @_,
-        proxy_class => 'Test::AutoMock::Proxy::Overloaded',
+        proxy_class => 'Test::AutoMock::Mock::Overloaded',
     );
     $mock->proxy;
 }

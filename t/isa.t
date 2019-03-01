@@ -8,7 +8,7 @@ use Test::AutoMock qw(mock manager);
         isa => 'Hoge',
     );
     isa_ok $mock, 'Hoge';
-    isa_ok $mock, 'Test::AutoMock::Proxy::Basic';
+    isa_ok $mock, 'Test::AutoMock::Mock::Basic';
     ok ! $mock->isa('Foo'), '$mock is not a Foo class';
 }
 
@@ -18,7 +18,7 @@ use Test::AutoMock qw(mock manager);
     );
     isa_ok $mock, 'Hoge';
     isa_ok $mock, 'Foo';
-    isa_ok $mock, 'Test::AutoMock::Proxy::Basic';
+    isa_ok $mock, 'Test::AutoMock::Mock::Basic';
     ok ! $mock->isa('Bar'), '$mock is not a Bar class';
 }
 
@@ -27,13 +27,13 @@ use Test::AutoMock qw(mock manager);
     manager($mock)->isa('Foo', 'Hoge');
     isa_ok $mock, 'Hoge';
     isa_ok $mock, 'Foo';
-    isa_ok $mock, 'Test::AutoMock::Proxy::Basic';
+    isa_ok $mock, 'Test::AutoMock::Mock::Basic';
     ok ! $mock->isa('Bar'), '$mock is not a Bar class';
 }
 
 {
-    isa_ok 'Test::AutoMock::Proxy::Basic', 'Test::AutoMock::Proxy::Basic', 'reflexive property';
-    ok ! Test::AutoMock::Proxy::Basic->isa('Hoge'), 'Proxy is not a Hoge class';
+    isa_ok 'Test::AutoMock::Mock::Basic', 'Test::AutoMock::Mock::Basic', 'reflexive property';
+    ok ! Test::AutoMock::Mock::Basic->isa('Hoge'), 'Proxy is not a Hoge class';
 }
 
 done_testing;

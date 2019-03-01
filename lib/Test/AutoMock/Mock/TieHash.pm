@@ -1,4 +1,4 @@
-package Test::AutoMock::Proxy::TieHash;
+package Test::AutoMock::Mock::TieHash;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);

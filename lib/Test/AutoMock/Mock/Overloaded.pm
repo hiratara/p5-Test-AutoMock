@@ -1,9 +1,9 @@
-package Test::AutoMock::Proxy::Overloaded;
+package Test::AutoMock::Mock::Overloaded;
 use strict;
 use warnings;
-use parent qw(Test::AutoMock::Proxy::Basic);
+use parent qw(Test::AutoMock::Mock::Basic);
 use Scalar::Util ();
-use Test::AutoMock::Proxy::Functions qw(get_manager);
+use Test::AutoMock::Mock::Functions qw(get_manager);
 use overload (
     '${}' => sub {
         my $self = shift;

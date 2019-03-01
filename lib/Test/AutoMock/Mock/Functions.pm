@@ -1,4 +1,4 @@
-package Test::AutoMock::Proxy::Functions;
+package Test::AutoMock::Mock::Functions;
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -9,7 +9,7 @@ our @EXPORT_OK = qw(new_proxy get_manager);
 sub new_proxy ($) {
     my $manager = shift;
 
-    my $proxy_class = $manager->{proxy_class} // 'Test::AutoMock::Proxy::Basic';
+    my $proxy_class = $manager->{proxy_class} // 'Test::AutoMock::Mock::Basic';
     bless \$manager, $proxy_class;
 }
 

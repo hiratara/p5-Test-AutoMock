@@ -1,4 +1,4 @@
-package Test::AutoMock::Proxy::TieArray;
+package Test::AutoMock::Mock::TieArray;
 use strict;
 use warnings;
 use Scalar::Util qw(weaken);
