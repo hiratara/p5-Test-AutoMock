@@ -33,7 +33,8 @@ use Test::AutoMock qw(mock manager);
 
 {
     isa_ok 'Test::AutoMock::Mock::Basic', 'Test::AutoMock::Mock::Basic', 'reflexive property';
-    ok ! Test::AutoMock::Mock::Basic->isa('Hoge'), 'Proxy is not a Hoge class';
+    ok ! Test::AutoMock::Mock::Basic->isa('Hoge'),
+       'Test::AutoMock::Mock::Basic is not a Hoge class';
 }
 
 done_testing;

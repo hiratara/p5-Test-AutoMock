@@ -29,7 +29,6 @@ sub new {
         calls => [],
         mock_class => $params{mock_class},
         mock => $params{mock},
-        proxy => undef,
         tie_hash => undef,  # See: Test::AutoMock::Mock::TieHash
         tie_array => undef,  # See: Test::AutoMock::Mock::TieArray
     } => $class;
@@ -265,8 +264,8 @@ my %default_overload_handlers = (
 
     'bool' => sub { !! 1 },
     '""' => sub {
-        my $proxy = shift;
-        sprintf "%s(0x%x)", blessed $proxy, refaddr $proxy;
+        my $mock = shift;
+        sprintf "%s(0x%x)", blessed $mock, refaddr $mock;
     },
     '0+' => sub { 1 },
     'qr' => sub { qr// },
@@ -282,10 +281,10 @@ my %default_overload_handlers = (
 );
 
 sub _overload_nomethod {
-    my ($self, $proxy, $other, $is_swapped, $operator, $is_numeric) = @_;
+    my ($self, $mock, $other, $is_swapped, $operator, $is_numeric) = @_;
 
     # don't record the call of copy constructor (and don't copy mocks)
-    return $proxy if $operator eq '=';
+    return $mock if $operator eq '=';
 
     my $operator_name = "`$operator`";
     my $default_handler;
@@ -296,13 +295,13 @@ sub _overload_nomethod {
     }
 
     $self->_call_method(
-        $proxy, $operator_name => [$other, $is_swapped],
+        $mock, $operator_name => [$other, $is_swapped],
         $default_handler,
     );
 }
 
 sub _deref_hash {
-    my ($self, $proxy) = @_;
+    my ($self, $mock) = @_;
 
     # don't record `%{}` calls
 
@@ -313,7 +312,7 @@ sub _deref_hash {
 sub tie_array { $_[0]->{tie_array} //= [] }
 
 sub _deref_array {
-    my ($self, $proxy) = @_;
+    my ($self, $mock) = @_;
 
     # don't record `@{}` calls
 
@@ -324,13 +323,13 @@ sub _deref_array {
 sub tie_hash { $_[0]->{tie_hash} //= {} }
 
 sub _deref_code {
-    my ($self, $proxy) = @_;
+    my ($self, $mock) = @_;
 
     # don't record `&{}` calls
 
     sub {
         my @args = @_;
-        $self->_call_method($proxy, '()', [@_], undef);
+        $self->_call_method($mock, '()', [@_], undef);
     };
 }
 
