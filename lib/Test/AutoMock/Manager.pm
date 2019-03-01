@@ -178,7 +178,7 @@ sub _record_call {
 }
 
 sub _call_method {
-    my ($self, $mock, $meth, $ref_params, $default_handler) = @_;
+    my ($self, $meth, $ref_params, $default_handler) = @_;
 
     $default_handler //= sub { $self->_get_child_mock($meth) };
 
@@ -188,7 +188,7 @@ sub _call_method {
     if (my $code = $self->{methods}{$meth}) {
         $code->(@$ref_params);
     } else {
-        $mock->$default_handler(@$ref_params);
+        $self->mock->$default_handler(@$ref_params);
     }
 }
 
@@ -281,10 +281,10 @@ my %default_overload_handlers = (
 );
 
 sub _overload_nomethod {
-    my ($self, $mock, $other, $is_swapped, $operator, $is_numeric) = @_;
+    my ($self, $other, $is_swapped, $operator, $is_numeric) = @_;
 
     # don't record the call of copy constructor (and don't copy mocks)
-    return $mock if $operator eq '=';
+    return $self->mock if $operator eq '=';
 
     my $operator_name = "`$operator`";
     my $default_handler;
@@ -295,7 +295,7 @@ sub _overload_nomethod {
     }
 
     $self->_call_method(
-        $mock, $operator_name => [$other, $is_swapped],
+        $operator_name => [$other, $is_swapped],
         $default_handler,
     );
 }
@@ -312,7 +312,7 @@ sub _deref_hash {
 sub tie_array { $_[0]->{tie_array} //= [] }
 
 sub _deref_array {
-    my ($self, $mock) = @_;
+    my ($self) = @_;
 
     # don't record `@{}` calls
 
@@ -323,13 +323,13 @@ sub _deref_array {
 sub tie_hash { $_[0]->{tie_hash} //= {} }
 
 sub _deref_code {
-    my ($self, $mock) = @_;
+    my ($self) = @_;
 
     # don't record `&{}` calls
 
     sub {
         my @args = @_;
-        $self->_call_method($mock, '()', [@_], undef);
+        $self->_call_method('()', [@_], undef);
     };
 }
 

@@ -14,7 +14,7 @@ sub FETCH {
     my $arrayref = $manager->tie_array;
     my $method_name = "[$key]";
 
-    $manager->_call_method($self, $method_name, [], sub {
+    $manager->_call_method($method_name, [], sub {
         my $self = shift;
         $arrayref->[$key] = $manager->child($method_name)->mock
                                                unless exists $arrayref->[$key];
@@ -27,7 +27,7 @@ sub STORE {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, "[$key]", [$value], sub {
+    $manager->_call_method("[$key]", [$value], sub {
         my ($self, $value) = @_;
         $arrayref->[$key] = $value;
     });
@@ -38,7 +38,7 @@ sub FETCHSIZE {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'FETCHSIZE', [], sub {
+    $manager->_call_method(FETCHSIZE => [], sub {
         my $self = shift;
         $#$arrayref + 1;
     });
@@ -49,7 +49,7 @@ sub STORESIZE {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'STORESIZE', [$count], sub {
+    $manager->_call_method(STORESIZE => [$count], sub {
         my ($self, $count) = @_;
         $#$arrayref = $count - 1;
     });
@@ -60,7 +60,7 @@ sub CLEAR {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'CLEAR', [], sub {
+    $manager->_call_method(CLEAR => [], sub {
         my $self = shift;
         @$arrayref = ();
     });
@@ -71,7 +71,7 @@ sub PUSH {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'PUSH', \@list, sub {
+    $manager->_call_method(PUSH => \@list, sub {
         my ($self, @list) = @_;
         push @$arrayref, @list;
     });
@@ -82,7 +82,7 @@ sub POP {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'POP', [], sub {
+    $manager->_call_method(POP => [], sub {
         my $self = shift;
         pop @$arrayref;
     });
@@ -93,7 +93,7 @@ sub SHIFT {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'SHIFT', [], sub {
+    $manager->_call_method(SHIFT => [], sub {
         my $self = shift;
         shift @$arrayref;
     });
@@ -104,7 +104,7 @@ sub UNSHIFT {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'UNSHIFT', \@list, sub {
+    $manager->_call_method(UNSHIFT => \@list, sub {
         my ($self, @list) = @_;
         unshift @$arrayref, @list;
     });
@@ -115,7 +115,7 @@ sub SPLICE {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'SPLICE', [$offset, $length, @list], sub {
+    $manager->_call_method(SPLICE => [$offset, $length, @list], sub {
         my ($self, $offset, $length, @list) = @_;
         splice @$arrayref, $offset, $length, @list;
     });
@@ -131,7 +131,7 @@ sub DELETE {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'DELETE', [$key], sub {
+    $manager->_call_method(DELETE => [$key], sub {
         my ($self, $key) = @_;
         delete $arrayref->[$key];
     });
@@ -142,7 +142,7 @@ sub EXISTS {
     my $manager = $$self;
     my $arrayref = $manager->tie_array;
 
-    $manager->_call_method($self, 'EXISTS', [$key], sub {
+    $manager->_call_method(EXISTS => [$key], sub {
         my ($self, $key) = @_;
         exists $arrayref->[$key];
     });

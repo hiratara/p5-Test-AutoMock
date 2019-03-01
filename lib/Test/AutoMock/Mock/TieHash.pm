@@ -14,7 +14,7 @@ sub FETCH {
     my $hashref = $manager->tie_hash;
     my $method_name = "{$key}";
 
-    $manager->_call_method($self, $method_name, [], sub {
+    $manager->_call_method($method_name, [], sub {
         my $self = shift;
         $hashref->{$key} = $manager->child($method_name)->mock
                                                 unless exists $hashref->{$key};
@@ -27,7 +27,7 @@ sub STORE {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, "{$key}", [$value], sub {
+    $manager->_call_method("{$key}", [$value], sub {
         my ($self, $value) = @_;
         $hashref->{$key} = $value;
     });
@@ -38,7 +38,7 @@ sub DELETE {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, "DELETE", [$key], sub {
+    $manager->_call_method(DELETE => [$key], sub {
         my ($self, $key) = @_;
         delete $hashref->{$key};
     });
@@ -49,7 +49,7 @@ sub CLEAR {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, "CLEAR", [], sub {
+    $manager->_call_method(CLEAR => [], sub {
         my $self = shift;
         %$hashref = ();
     });
@@ -60,7 +60,7 @@ sub EXISTS {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, 'EXISTS', [$key], sub {
+    $manager->_call_method(EXISTS => [$key], sub {
         my ($self, $key) = @_;
         exists $hashref->{$key};
     });
@@ -71,7 +71,7 @@ sub FIRSTKEY {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, 'FIRSTKEY', [], sub {
+    $manager->_call_method(FIRSTKEY => [], sub {
         my $self = shift;
         keys %$hashref;  # reset each() iterator
         each %$hashref;
@@ -83,7 +83,7 @@ sub NEXTKEY {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, 'NEXTKEY', [$lastkey], sub {
+    $manager->_call_method(NEXTKEY => [$lastkey], sub {
         my $self = shift;
         each %$hashref;
     });
@@ -94,7 +94,7 @@ sub SCALAR {
     my $manager = $$self;
     my $hashref = $manager->tie_hash;
 
-    $manager->_call_method($self, 'SCALAR', [], sub {
+    $manager->_call_method(SCALAR => [], sub {
         my $self = shift;
         scalar %$hashref;
     });

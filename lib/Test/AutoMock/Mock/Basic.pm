@@ -33,7 +33,7 @@ sub AUTOLOAD {
     (my $meth = our $AUTOLOAD) =~ s/.*:://;
 
     my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-    $manager->_call_method($self, $meth => \@params, undef);
+    $manager->_call_method($meth => \@params, undef);
 }
 
 1;

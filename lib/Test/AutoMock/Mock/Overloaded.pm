@@ -16,32 +16,32 @@ use overload (
     '${}' => sub {
         my $self = shift;
         my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-        $manager->_overload_nomethod($self, @_, '${}')
+        $manager->_overload_nomethod(@_, '${}')
     },
     '@{}' => sub {
         my $self = shift;
         my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-        $manager->_deref_array($self, @_)
+        $manager->_deref_array(@_)
     },
     '%{}' => sub {
         my $self = shift;
         my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-        $manager->_deref_hash($self, @_)
+        $manager->_deref_hash(@_)
     },
     '&{}' => sub {
         my $self = shift;
         my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-        $manager->_deref_code($self, @_)
+        $manager->_deref_code(@_)
     },
     '*{}' => sub {
         my $self = shift;
         my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-        $manager->_overload_nomethod($self, @_, '*{}')
+        $manager->_overload_nomethod(@_, '*{}')
     },
     nomethod => sub {
         my $self = shift;
         my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
-        $manager->_overload_nomethod($self, @_);
+        $manager->_overload_nomethod(@_);
     },
     fallback => 0,
 );
