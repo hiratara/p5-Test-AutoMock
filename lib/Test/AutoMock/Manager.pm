@@ -1,3 +1,11 @@
+BEGIN {
+    # A hack to suppress redefined warning caused by circulation dependency
+    $INC{'Test/AutoMock/Manager.pm'} //= do {
+        require File::Spec;
+        File::Spec->rel2abs(__FILE__);
+    };
+}
+
 package Test::AutoMock::Manager;
 use strict;
 use warnings;
