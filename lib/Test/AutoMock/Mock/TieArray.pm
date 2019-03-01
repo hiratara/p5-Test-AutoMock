@@ -1,26 +1,17 @@
 package Test::AutoMock::Mock::TieArray;
 use strict;
 use warnings;
-use Scalar::Util qw(weaken);
-
-sub new {
-    my ($class, $manager) = @_;
-
-    my $self = [[], $manager];
-    weaken($self->[1]);  # avoid cyclic reference
-
-    bless $self => $class;
-}
 
 sub TIEARRAY {
     my ($class, $manager) = @_;
 
-    $class->new($manager);
+    bless \$manager => $class;
 }
 
 sub FETCH {
     my ($self, $key) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
     my $method_name = "[$key]";
 
     $manager->_call_method($self, $method_name, [], sub {
@@ -33,7 +24,8 @@ sub FETCH {
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, "[$key]", [$value], sub {
         my ($self, $value) = @_;
@@ -43,7 +35,8 @@ sub STORE {
 
 sub FETCHSIZE {
     my $self = shift;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'FETCHSIZE', [], sub {
         my $self = shift;
@@ -53,7 +46,8 @@ sub FETCHSIZE {
 
 sub STORESIZE {
     my ($self, $count) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'STORESIZE', [$count], sub {
         my ($self, $count) = @_;
@@ -63,7 +57,8 @@ sub STORESIZE {
 
 sub CLEAR {
     my $self = shift;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'CLEAR', [], sub {
         my $self = shift;
@@ -73,7 +68,8 @@ sub CLEAR {
 
 sub PUSH {
     my ($self, @list) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'PUSH', \@list, sub {
         my ($self, @list) = @_;
@@ -83,7 +79,8 @@ sub PUSH {
 
 sub POP {
     my $self = shift;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'POP', [], sub {
         my $self = shift;
@@ -93,7 +90,8 @@ sub POP {
 
 sub SHIFT {
     my $self = shift;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'SHIFT', [], sub {
         my $self = shift;
@@ -103,7 +101,8 @@ sub SHIFT {
 
 sub UNSHIFT {
     my ($self, @list) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'UNSHIFT', \@list, sub {
         my ($self, @list) = @_;
@@ -113,7 +112,8 @@ sub UNSHIFT {
 
 sub SPLICE {
     my ($self, $offset, $length, @list) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'SPLICE', [$offset, $length, @list], sub {
         my ($self, $offset, $length, @list) = @_;
@@ -128,7 +128,8 @@ sub SPLICE {
 
 sub DELETE {
     my ($self, $key) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'DELETE', [$key], sub {
         my ($self, $key) = @_;
@@ -138,7 +139,8 @@ sub DELETE {
 
 sub EXISTS {
     my ($self, $key) = @_;
-    my ($arrayref, $manager) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
     $manager->_call_method($self, 'EXISTS', [$key], sub {
         my ($self, $key) = @_;

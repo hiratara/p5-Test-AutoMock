@@ -22,9 +22,10 @@ sub new {
         mock_class => $params{mock_class},
         mock => $params{mock},
         proxy => undef,
-        tie_hash => undef,
-        tie_array => undef,
+        tie_hash => undef,  # See: Test::AutoMock::Mock::TieHash
+        tie_array => undef,  # See: Test::AutoMock::Mock::TieArray
     } => $class;
+
     # avoid cyclic reference
     weaken($self->{parent});
     weaken($self->{mock});
@@ -38,16 +39,6 @@ sub new {
         my @args = ref $isa eq 'ARRAY' ? @$isa : ($isa, );
         $self->isa(@args);
     }
-
-    $self->{tie_hash} = do {
-        tie my %h, 'Test::AutoMock::Mock::TieHash', $self;
-        \%h;
-    };
-
-    $self->{tie_array} = do {
-        tie my @arr, 'Test::AutoMock::Mock::TieArray', $self;
-        \@arr;
-    };
 
     $self;
 }
@@ -307,16 +298,22 @@ sub _deref_hash {
 
     # don't record `%{}` calls
 
-    $self->{tie_hash}
+    tie my %hash, 'Test::AutoMock::Mock::TieHash', $self;
+    \%hash;
 }
+
+sub tie_array { $_[0]->{tie_array} //= [] }
 
 sub _deref_array {
     my ($self, $proxy) = @_;
 
     # don't record `@{}` calls
 
-    $self->{tie_array};
+    tie my @array, 'Test::AutoMock::Mock::TieArray', $self;
+    \@array;
 }
+
+sub tie_hash { $_[0]->{tie_hash} //= {} }
 
 sub _deref_code {
     my ($self, $proxy) = @_;

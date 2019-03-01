@@ -1,26 +1,17 @@
 package Test::AutoMock::Mock::TieHash;
 use strict;
 use warnings;
-use Scalar::Util qw(weaken);
-
-sub new {
-    my ($class, $manager) = @_;
-
-    my $self = [{}, $manager];
-    weaken($self->[1]);  # avoid cyclic reference
-
-    bless $self => $class;
-}
 
 sub TIEHASH {
     my ($class, $manager) = @_;
 
-    $class->new($manager);
+    bless \$manager => $class;
 }
 
 sub FETCH {
     my ($self, $key) = @_;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
     my $method_name = "{$key}";
 
     $manager->_call_method($self, $method_name, [], sub {
@@ -33,7 +24,8 @@ sub FETCH {
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, "{$key}", [$value], sub {
         my ($self, $value) = @_;
@@ -43,7 +35,8 @@ sub STORE {
 
 sub DELETE {
     my ($self, $key) = @_;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, "DELETE", [$key], sub {
         my ($self, $key) = @_;
@@ -53,7 +46,8 @@ sub DELETE {
 
 sub CLEAR {
     my $self = shift;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, "CLEAR", [], sub {
         my $self = shift;
@@ -63,7 +57,8 @@ sub CLEAR {
 
 sub EXISTS {
     my ($self, $key) = @_;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, 'EXISTS', [$key], sub {
         my ($self, $key) = @_;
@@ -73,7 +68,8 @@ sub EXISTS {
 
 sub FIRSTKEY {
     my $self = shift;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, 'FIRSTKEY', [], sub {
         my $self = shift;
@@ -84,7 +80,8 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
     my ($self, $lastkey) = @_;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, 'NEXTKEY', [$lastkey], sub {
         my $self = shift;
@@ -94,7 +91,8 @@ sub NEXTKEY {
 
 sub SCALAR {
     my $self = shift;
-    my ($hashref, $manager) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
     $manager->_call_method($self, 'SCALAR', [], sub {
         my $self = shift;
