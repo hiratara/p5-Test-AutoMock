@@ -9,39 +9,38 @@ BEGIN {
 package Test::AutoMock::Mock::Overloaded;
 use strict;
 use warnings;
-use namespace::autoclean;
 use parent qw(Test::AutoMock::Mock::Basic);
 use Scalar::Util ();
-use Test::AutoMock::Mock::Functions qw(get_manager);
+use Test::AutoMock::Mock::Functions ();
 use overload (
     '${}' => sub {
         my $self = shift;
-        my $manager = get_manager $self;
+        my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
         $manager->_overload_nomethod($self, @_, '${}')
     },
     '@{}' => sub {
         my $self = shift;
-        my $manager = get_manager $self;
+        my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
         $manager->_deref_array($self, @_)
     },
     '%{}' => sub {
         my $self = shift;
-        my $manager = get_manager $self;
+        my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
         $manager->_deref_hash($self, @_)
     },
     '&{}' => sub {
         my $self = shift;
-        my $manager = get_manager $self;
+        my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
         $manager->_deref_code($self, @_)
     },
     '*{}' => sub {
         my $self = shift;
-        my $manager = get_manager $self;
+        my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
         $manager->_overload_nomethod($self, @_, '*{}')
     },
     nomethod => sub {
         my $self = shift;
-        my $manager = get_manager $self;
+        my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
         $manager->_overload_nomethod($self, @_);
     },
     fallback => 0,

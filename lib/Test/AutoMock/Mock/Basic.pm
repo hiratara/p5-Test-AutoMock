@@ -9,9 +9,8 @@ BEGIN {
 package Test::AutoMock::Mock::Basic;
 use strict;
 use warnings;
-use namespace::autoclean;
 use Scalar::Util ();
-use Test::AutoMock::Mock::Functions qw(get_manager);
+use Test::AutoMock::Mock::Functions ();
 
 sub isa {
     my $class_or_self = shift;
@@ -19,7 +18,8 @@ sub isa {
 
     # don't look for isa if $self is a class name
     if (Scalar::Util::blessed $class_or_self) {
-        my $manager = get_manager $class_or_self;
+        my $manager =
+            Test::AutoMock::Mock::Functions::get_manager $class_or_self;
         return 1 if $manager->{isa}{$name};
     }
 
@@ -32,7 +32,7 @@ sub AUTOLOAD {
     my ($self, @params) = @_;
     (my $meth = our $AUTOLOAD) =~ s/.*:://;
 
-    my $manager = get_manager $self;
+    my $manager = Test::AutoMock::Mock::Functions::get_manager $self;
     $manager->_call_method($self, $meth => \@params, undef);
 }
 
