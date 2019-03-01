@@ -118,12 +118,12 @@ __END__
 
 =head1 NAME
 
-Test::AutoMock::Overloaded::TieHash - Track operations to hash-ref
+Test::AutoMock::Mock::TieHash - Track operations to hash-ref
 
 =head1 DESCRIPTION
 
-This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
-hash-refs. You won't instantiate this class.
+This module is part of L<Test::AutoMock::Mock::Overloaded> and tracks
+operations to hash-refs. You won't instantiate this class.
 
 For the sake of simplicity, we use the notation C<{key}> for C<FETCH> and
 C<STORE>. For other tie methods, record with the original name.

@@ -341,101 +341,19 @@ __END__
 
 =head1 NAME
 
-Test::AutoMock - A mock that can be used with a minimum setup
-
-=head1 SYNOPSIS
-
-    use Test::AutoMock;
-    use Test::More;
-
-    # a black box function you want to test
-    sub get_metacpan {
-        my $ua = shift;
-        my $response = $ua->get('https://metacpan.org/');
-        if ($response->is_success) {
-            return $response->decoded_content;  # or whatever
-        }
-        else {
-            die $response->status_line;
-        }
-    }
-
-    # build and set up the mock
-    my $mock_ua = Test::AutoMock->new(
-        methods => {
-            # implement only the method you are interested in
-            'get->decoded_content' => "Hello, metacpan!\n",
-        },
-    );
-
-    # action first
-    my $body = get_metacpan($mock_ua);
-
-    # then, assertion
-    is $body, "Hello, metacpan!\n";
-    $mock_ua->automock_called_with_ok('get->is_success' => []);
-    $mock_ua->automock_not_called_ok('get->status_line');
-
-    # print all recorded calls
-    for ($mock_ua->automock_calls) {
-        my ($method, $args) = @$_;
-        note "$method(" . join(', ', @$args) . ")";
-    }
+Test::AutoMock::Manager - Manage Test::AutoMock::Mock::Basic
 
 =head1 DESCRIPTION
 
-Test::AutoMock is a mock module designed to be used with a minimal setup.
-AutoMock can respond to any method call and returns a new AutoMock instance
-as a return value. Therefore, you can use it as a mock object without having
-to define all the methods. Even if method calls are nested, there is no
-problem.
-
-Auto records all method calls on all descendants. You can verify the method
-calls and its arguments after using the mock. This is not the "record and
-replay" model but the "action and assertion" model.
-
-You can also mock many overloaded operators and hashes, arrays with
-L<Test::AutoMock::Overloaded>. If you want to apply monkey patch to use
-AutoMock, check L<Test::AutoMock::Patch>.
-
-Test::AutoMock is inspired by Python3's unittest.mock module.
-
-=head1 ALPHA WARNING
-
-This module is under development. The API, including names of classes and
-methods, may be subject to BACKWARD INCOMPATIBLE CHANGES.
+This module provides an interface for manipulating
+L<Test::AutoMock::Mock::Basic> and L<Test::AutoMock::Mock::Overloaded>.
 
 =head1 METHODS
 
-=head2 new
+=head2 add_method
 
-    my $mock = Test::AutoMock->new(
-        methods => {
-            agent => 'libwww-perl/AutoMock',
-            'get->is_success' => sub { 1 },
-        },
-        isa => 'LWP::UserAgent',
-    );
-
-Constructor of AutoMock. It takes the following parameters.
-
-=over 4
-
-=item methods
-
-A hash-ref of method definitions. See L<automock_add_method>.
-
-=item isa
-
-A super class of this mock. See L<automock_isa>.
-To specify multiple classes, use array-ref.
-
-=back
-
-=head2 automock_add_method
-
-    $mock->automock_add_method(add_one => sub { $_[0] + 1 });
-    $mock->automock_add_method('path->to->some_obj->name' => 'some_obj');
+    manager($mock)->add_method(add_one => sub { $_[0] + 1 });
+    manager($mock)->add_method('path->to->some_obj->name' => 'some_obj');
 
 Define the behavior of AutoMock when calling a method.
 
@@ -447,28 +365,30 @@ you'll get an error.
 
 The second argument specifies the return value when the method is called.
 If you specify a code reference, that code will be called on method invocation.
-Be aware that C<$self> is not included in the argument.
+Be aware that nither C<$mock> nor C<manager($mock)> are not included
+in arguments.
 
-=head2 automock_isa
+=head2 set_isa
 
-    $mock->automock_isa('Foo', 'Hoge');
+    manager($mock)->set_isa('Foo', 'Hoge');
 
 Specify the superclass of the mock. This specification only affects the C<isa>
 method. It is convenient when argument is checked like L<Moose> field.
 
-=head2 automock_child
+=head2 child
 
-    # return the $mock->some_field
-    $mock->automock_child('some_field');
+    # return the manager($mock->some_field)
+    manager($mock)->child('some_field');
 
-Return the mock's child. Since this call is not recorded, it is convenient when
-you want to avoid recording unnecessary calls when writing assertions.
+Return the Manager of the mock's child. Since this call is not recorded, it is
+convenient when you want to avoid recording unnecessary calls when writing
+assertions.
 
 TODO: Support C<< -> >> notations.
 
-=head2 automock_calls
+=head2 calls
 
-    my @calls = $mock->automock_calls;
+    my @calls = manager($mock)->calls;
 
 Returns all recorded method calls. The element of "calls" is a two-element
 array-ref. The first element is a method name, and the second element is an
@@ -478,28 +398,28 @@ Method calls to children are also recorded in C<$mock>. For example, calling
 C<< $mock->child->do_it >> will record two calls C<'child'> and
 C<< 'child->do_it' >>.
 
-=head2 automock_reset
+=head2 reset
 
 Erase all recorded method calls. Delete all method call history from descendant
 mocks as well. It is used when you want to reuse mock.
 
-=head2 automock_called_ok
+=head2 called_ok
 
-    $mock->automock_called_ok('hoge->bar');
+    manager($mock)->called_ok('hoge->bar');
 
 Checks if the method was called. It is supposed to be used with L<Test::More> .
 
-=head2 automock_called_with_ok
+=head2 called_with_ok
 
-    $mock->automock_called_with_ok(
+    manager($mock)->called_with_ok(
         'hoge->bar', [10, 20],
     );
 
 Checks if the method was called with specified arguments.
 
-=head2 automock_not_called_ok
+=head2 not_called_ok
 
-    $mock->automock_not_called_ok('hoge->bar');
+    manager($mock)->not_called_ok('hoge->bar');
 
 Checks if the method was not called.
 
@@ -509,6 +429,14 @@ Copyright (C) Masahiro Honma.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Test::AutoMock>
+
+=back
 
 =head1 AUTHOR
 

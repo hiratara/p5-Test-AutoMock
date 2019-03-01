@@ -165,12 +165,12 @@ __END__
 
 =head1 NAME
 
-Test::AutoMock::Overloaded::TieArray - Track operations to array-ref
+Test::AutoMock::Mock::TieArray - Track operations to array-ref
 
 =head1 DESCRIPTION
 
-This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
-array-refs. You won't instantiate this class.
+This module is part of L<Test::AutoMock::Mock::Overloaded> and tracks
+operations to array-refs. You won't instantiate this class.
 
 For the sake of simplicity, we use the notation C<[index]> for C<FETCH> and
 C<STORE>. For other tie methods, record with the original name.

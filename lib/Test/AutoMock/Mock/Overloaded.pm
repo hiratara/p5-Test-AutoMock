@@ -54,38 +54,42 @@ __END__
 
 =head1 NAME
 
-Test::AutoMock::Overloaded - AutoMock that supports operator overloading
+Test::AutoMock::Mock::Overloaded - Mock that supports operator overloading
 
 =head1 SYNOPSIS
 
-    use Test::AutoMock::Overloaded;
-    use Test::More;
+  use Test::AutoMock qw(mock_overloaded manager);
+  use Test::More import => [qw(is done_testing)];
 
-    my $mock = Test::AutoMock::Overloaded->new;
+  my $mock = mock_overloaded;
 
-    # define operators, hashes, arrays
-    $mock->automock_add_method('`+`' => 10);
-    $mock->automock_add_method('{key}' => 'value');
-    $mock->automock_add_method('[0]' => 'zero');
+  # define operators, hashes, arrays
+  manager($mock)->add_method('`+`' => 10);
+  manager($mock)->add_method('{key}' => 'value');
+  manager($mock)->add_method('[0]' => 'zero');
 
-    # call overloaded operators
-    is($mock + 5, 10);
-    is($mock->{key}, 'value');
-    is($mock->[0], 'zero');
+  # call overloaded operators
+  is($mock + 5, 10);
+  is($mock->{key}, 'value');
+  is($mock->[0], 'zero');
 
-    # varify calls
-    $mock->automock_called_with_ok('`+`', [5, '']);
-    $mock->automock_called_ok('{key}');
-    $mock->automock_called_ok('[0]');
+  # varify calls
+  manager($mock)->called_with_ok('`+`', [5, '']);
+  manager($mock)->called_ok('{key}');
+  manager($mock)->called_ok('[0]');
 
 =head1 DESCRIPTION
 
-It is a subclass of AutoMock that supports operator overloading.
+It is a subclass of L<Test::AutoMock::Mock::Basic> that supports operator
+overloading.
+
+Do not instantiate this class directly. Use L<Test::AutoMock::mock_overloaded>
+instead.
 
 =head1 SPECIAL METHODS
 
 This class supports special notation methods. It can be used with methods such
-as C<automock_called_ok> and C<automock_add_method>.
+as C<< manager($mock)->called_ok >> and C<< manager($mock)->add_method >>.
 
 =head2 OPERATOR OVERLOADING
 
@@ -159,12 +163,12 @@ array-ref, code-ref.
 =item C<[index]>, C<FETCHSIZE>, C<STORESIZE>, C<CLEAR>, C<PUSH>, C<POP>, C<SHIFT>, C<UNSHIFT>, C<DELETE>, C<EXISTS>
 
 This name is used when the mock is called as an array reference.
-See L<Test::AutoMock::Overloaded::TieArray> for details.
+See L<Test::AutoMock::Mock::TieArray> for details.
 
 =item C<{key}>, C<DELETE>, C<CLEAR>, C<EXISTS>, C<FIRSTKEY>, C<NEXTKEY>, C<SCALAR>
 
 This name is used when the mock is called as an hash reference.
-See L<Test::AutoMock::Overloaded::TieHash> for details.
+See L<Test::AutoMock::Mock::TieHash> for details.
 
 =item C<()>
 

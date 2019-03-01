@@ -46,3 +46,62 @@ sub get_manager ($) {
 }
 
 1;
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::AutoMock::Mock::Functions - Functions to manipulate mocks
+
+=head1 DESCRIPTION
+
+This module provides methods of L<Test::AutoMock::Mock::Basic>.
+
+We defined these methods into different packages so as not to affect
+the behavior of the mock.
+
+Rather than using this class directly, it would be more convenient to use
+a wrapper defined for L<Test::AutoMock>.
+
+=head1 FUNCTIONS
+
+=head2 new_mock
+
+  my $mock1 = new_mock('Test::AutoMock::Mock::Basic');
+  my $mock2 = new_mock(
+      'Test::AutoMock::Mock::Overloaded',
+      methods => { 'some->method' => 1 },
+  );
+
+This is a constructor. Pass in the name of the class to instantiate as
+the first argument.
+
+=head2 get_manager
+
+Get the manager object of the mock.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Test::AutoMock>
+
+=item L<Test::AutoMock::Mock::Basic>
+
+=item L<Test::AutoMock::Mock::Overloaded>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Honma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Masahiro Honma E<lt>hiratara@cpan.orgE<gt>
+
+=cut
+

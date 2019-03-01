@@ -37,3 +37,42 @@ sub AUTOLOAD {
 }
 
 1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::AutoMock::Mock::Basic
+
+=head1 DESCRIPTION
+
+The mock class. Only C<isa>, C<DESTROY>, C<AUTOLOAD> methods are implemented.
+You operate this class with the function defined in
+L<Test::AutoMock::Mock::Functions>.
+
+Do not instantiate this class directly. Use L<Test::AutoMock::mock> instead.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Test::MockObject>
+
+=item L<Test::AutoMock::Mock::Functions>
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Masahiro Honma.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Masahiro Honma E<lt>hiratara@cpan.orgE<gt>
+
+=cut
+
