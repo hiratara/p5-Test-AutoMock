@@ -45,7 +45,7 @@ sub new {
 
     if (my $isa = $params{isa}) {
         my @args = ref $isa eq 'ARRAY' ? @$isa : ($isa, );
-        $self->isa(@args);
+        $self->set_isa(@args);
     }
 
     $self;
@@ -83,7 +83,7 @@ sub add_method {
     $self->{methods}{$name} = $code;
 }
 
-sub isa {
+sub set_isa {
     my $self = shift;
 
     my %isa;

@@ -24,7 +24,7 @@ use Test::AutoMock qw(mock manager);
 
 {
     my $mock = mock(isa => 'Bar');
-    manager($mock)->isa('Foo', 'Hoge');
+    manager($mock)->set_isa('Foo', 'Hoge');
     isa_ok $mock, 'Hoge';
     isa_ok $mock, 'Foo';
     isa_ok $mock, 'Test::AutoMock::Mock::Basic';
