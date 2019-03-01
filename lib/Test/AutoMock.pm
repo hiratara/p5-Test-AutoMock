@@ -130,8 +130,8 @@ for details.
 
 All L<Test::AutoMock::Mock::Basic> and L<Test::AutoMock::Mock::Overloaded>
 instances have the Manager class. The manager and the mock correspond one to
-one. In fact, C<manager($mock)->mock == $mock> and
-C<manager($manager->mock) == $manager> hold.
+one. In fact, C<< manager($mock)->mock == $mock >> and
+C<< manager($manager->mock) == $manager >> hold.
 
 =head1 SEE ALSO
 

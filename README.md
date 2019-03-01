@@ -101,8 +101,8 @@ for details.
 
 All [Test::AutoMock::Mock::Basic](https://metacpan.org/pod/Test::AutoMock::Mock::Basic) and [Test::AutoMock::Mock::Overloaded](https://metacpan.org/pod/Test::AutoMock::Mock::Overloaded)
 instances have the Manager class. The manager and the mock correspond one to
-one. In fact, `manager($mock)-`mock == $mock> and
-`manager($manager-`mock) == $manager> hold.
+one. In fact, `manager($mock)->mock == $mock` and
+`manager($manager->mock) == $manager` hold.
 
 # SEE ALSO
 
