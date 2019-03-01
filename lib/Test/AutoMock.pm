@@ -3,7 +3,6 @@ use 5.008001;
 use strict;
 use warnings;
 use Exporter qw(import);
-use Scalar::Util qw(refaddr);
 use Test::AutoMock::Mock::Functions qw(new_mock get_manager);
 
 our $VERSION = "0.01";
