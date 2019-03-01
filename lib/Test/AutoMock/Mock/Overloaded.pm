@@ -1,6 +1,7 @@
 package Test::AutoMock::Mock::Overloaded;
 use strict;
 use warnings;
+use namespace::autoclean;
 use parent qw(Test::AutoMock::Mock::Basic);
 use Scalar::Util ();
 use Test::AutoMock::Mock::Functions qw(get_manager);

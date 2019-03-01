@@ -1,6 +1,7 @@
 package Test::AutoMock::Mock::Basic;
 use strict;
 use warnings;
+use namespace::autoclean;
 use Scalar::Util ();
 use Test::AutoMock::Mock::Functions qw(get_manager);
 
