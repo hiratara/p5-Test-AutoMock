@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply done_testing)];
-use Test::AutoMock::Overloaded;
+use Test::AutoMock qw(mock_overloaded manager);
 
 {
-    my $mock = Test::AutoMock::Overloaded->new;
+    my $mock = mock_overloaded;
     my $array = $mock->ref_array;
 
     # FETCH
@@ -49,7 +49,7 @@ use Test::AutoMock::Overloaded;
     # assert size of array
     is scalar @$array, 2;
 
-    my @calls = $mock->automock_calls;
+    my @calls = manager($mock)->calls;
     is @calls, 17;
     is_deeply $calls[0], ['ref_array', []];
     is_deeply $calls[1], ['ref_array->[0]', []];

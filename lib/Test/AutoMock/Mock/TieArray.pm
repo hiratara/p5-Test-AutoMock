@@ -1,31 +1,22 @@
-package Test::AutoMock::Overloaded::TieArray;
+package Test::AutoMock::Mock::TieArray;
 use strict;
 use warnings;
-use Scalar::Util qw(weaken);
-
-sub new {
-    my ($class, $lazy_mock) = @_;
-
-    my $self = [[], $lazy_mock];
-    weaken($self->[1]);  # avoid cyclic reference
-
-    bless $self => $class;
-}
 
 sub TIEARRAY {
-    my ($class, $lazy_mock) = @_;
+    my ($class, $manager) = @_;
 
-    $class->new($lazy_mock);
+    bless \$manager => $class;
 }
 
 sub FETCH {
     my ($self, $key) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
     my $method_name = "[$key]";
 
-    $lazy_mock->_call_method($method_name, [], sub {
+    $manager->_call_method($method_name, [], sub {
         my $self = shift;
-        $arrayref->[$key] = $self->automock_child($method_name)
+        $arrayref->[$key] = $manager->child($method_name)->mock
                                                unless exists $arrayref->[$key];
         $arrayref->[$key];
     });
@@ -33,9 +24,10 @@ sub FETCH {
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method("[$key]", [$value], sub {
+    $manager->_call_method("[$key]", [$value], sub {
         my ($self, $value) = @_;
         $arrayref->[$key] = $value;
     });
@@ -43,9 +35,10 @@ sub STORE {
 
 sub FETCHSIZE {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('FETCHSIZE', [], sub {
+    $manager->_call_method(FETCHSIZE => [], sub {
         my $self = shift;
         $#$arrayref + 1;
     });
@@ -53,9 +46,10 @@ sub FETCHSIZE {
 
 sub STORESIZE {
     my ($self, $count) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('STORESIZE', [$count], sub {
+    $manager->_call_method(STORESIZE => [$count], sub {
         my ($self, $count) = @_;
         $#$arrayref = $count - 1;
     });
@@ -63,9 +57,10 @@ sub STORESIZE {
 
 sub CLEAR {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('CLEAR', [], sub {
+    $manager->_call_method(CLEAR => [], sub {
         my $self = shift;
         @$arrayref = ();
     });
@@ -73,9 +68,10 @@ sub CLEAR {
 
 sub PUSH {
     my ($self, @list) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('PUSH', \@list, sub {
+    $manager->_call_method(PUSH => \@list, sub {
         my ($self, @list) = @_;
         push @$arrayref, @list;
     });
@@ -83,9 +79,10 @@ sub PUSH {
 
 sub POP {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('POP', [], sub {
+    $manager->_call_method(POP => [], sub {
         my $self = shift;
         pop @$arrayref;
     });
@@ -93,9 +90,10 @@ sub POP {
 
 sub SHIFT {
     my $self = shift;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('SHIFT', [], sub {
+    $manager->_call_method(SHIFT => [], sub {
         my $self = shift;
         shift @$arrayref;
     });
@@ -103,9 +101,10 @@ sub SHIFT {
 
 sub UNSHIFT {
     my ($self, @list) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('UNSHIFT', \@list, sub {
+    $manager->_call_method(UNSHIFT => \@list, sub {
         my ($self, @list) = @_;
         unshift @$arrayref, @list;
     });
@@ -113,9 +112,10 @@ sub UNSHIFT {
 
 sub SPLICE {
     my ($self, $offset, $length, @list) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('SPLICE', [$offset, $length, @list], sub {
+    $manager->_call_method(SPLICE => [$offset, $length, @list], sub {
         my ($self, $offset, $length, @list) = @_;
         splice @$arrayref, $offset, $length, @list;
     });
@@ -128,9 +128,10 @@ sub SPLICE {
 
 sub DELETE {
     my ($self, $key) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('DELETE', [$key], sub {
+    $manager->_call_method(DELETE => [$key], sub {
         my ($self, $key) = @_;
         delete $arrayref->[$key];
     });
@@ -138,9 +139,10 @@ sub DELETE {
 
 sub EXISTS {
     my ($self, $key) = @_;
-    my ($arrayref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $arrayref = $manager->tie_array;
 
-    $lazy_mock->_call_method('EXISTS', [$key], sub {
+    $manager->_call_method(EXISTS => [$key], sub {
         my ($self, $key) = @_;
         exists $arrayref->[$key];
     });
@@ -163,12 +165,12 @@ __END__
 
 =head1 NAME
 
-Test::AutoMock::Overloaded::TieArray - Track operations to array-ref
+Test::AutoMock::Mock::TieArray - Track operations to array-ref
 
 =head1 DESCRIPTION
 
-This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
-array-refs. You won't instantiate this class.
+This module is part of L<Test::AutoMock::Mock::Overloaded> and tracks
+operations to array-refs. You won't instantiate this class.
 
 For the sake of simplicity, we use the notation C<[index]> for C<FETCH> and
 C<STORE>. For other tie methods, record with the original name.

@@ -1,31 +1,22 @@
-package Test::AutoMock::Overloaded::TieHash;
+package Test::AutoMock::Mock::TieHash;
 use strict;
 use warnings;
-use Scalar::Util qw(weaken);
-
-sub new {
-    my ($class, $lazy_mock) = @_;
-
-    my $self = [{}, $lazy_mock];
-    weaken($self->[1]);  # avoid cyclic reference
-
-    bless $self => $class;
-}
 
 sub TIEHASH {
-    my ($class, $lazy_mock) = @_;
+    my ($class, $manager) = @_;
 
-    $class->new($lazy_mock);
+    bless \$manager => $class;
 }
 
 sub FETCH {
     my ($self, $key) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
     my $method_name = "{$key}";
 
-    $lazy_mock->_call_method($method_name, [], sub {
+    $manager->_call_method($method_name, [], sub {
         my $self = shift;
-        $hashref->{$key} = $self->automock_child($method_name)
+        $hashref->{$key} = $manager->child($method_name)->mock
                                                 unless exists $hashref->{$key};
         $hashref->{$key};
     });
@@ -33,9 +24,10 @@ sub FETCH {
 
 sub STORE {
     my ($self, $key, $value) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method("{$key}", [$value], sub {
+    $manager->_call_method("{$key}", [$value], sub {
         my ($self, $value) = @_;
         $hashref->{$key} = $value;
     });
@@ -43,9 +35,10 @@ sub STORE {
 
 sub DELETE {
     my ($self, $key) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method("DELETE", [$key], sub {
+    $manager->_call_method(DELETE => [$key], sub {
         my ($self, $key) = @_;
         delete $hashref->{$key};
     });
@@ -53,9 +46,10 @@ sub DELETE {
 
 sub CLEAR {
     my $self = shift;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method("CLEAR", [], sub {
+    $manager->_call_method(CLEAR => [], sub {
         my $self = shift;
         %$hashref = ();
     });
@@ -63,9 +57,10 @@ sub CLEAR {
 
 sub EXISTS {
     my ($self, $key) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method('EXISTS', [$key], sub {
+    $manager->_call_method(EXISTS => [$key], sub {
         my ($self, $key) = @_;
         exists $hashref->{$key};
     });
@@ -73,9 +68,10 @@ sub EXISTS {
 
 sub FIRSTKEY {
     my $self = shift;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method('FIRSTKEY', [], sub {
+    $manager->_call_method(FIRSTKEY => [], sub {
         my $self = shift;
         keys %$hashref;  # reset each() iterator
         each %$hashref;
@@ -84,9 +80,10 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
     my ($self, $lastkey) = @_;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method('NEXTKEY', [$lastkey], sub {
+    $manager->_call_method(NEXTKEY => [$lastkey], sub {
         my $self = shift;
         each %$hashref;
     });
@@ -94,9 +91,10 @@ sub NEXTKEY {
 
 sub SCALAR {
     my $self = shift;
-    my ($hashref, $lazy_mock) = @$self;
+    my $manager = $$self;
+    my $hashref = $manager->tie_hash;
 
-    $lazy_mock->_call_method('SCALAR', [], sub {
+    $manager->_call_method(SCALAR => [], sub {
         my $self = shift;
         scalar %$hashref;
     });
@@ -120,12 +118,12 @@ __END__
 
 =head1 NAME
 
-Test::AutoMock::Overloaded::TieHash - Track operations to hash-ref
+Test::AutoMock::Mock::TieHash - Track operations to hash-ref
 
 =head1 DESCRIPTION
 
-This module is part of L<Test::AutoMock::Overloaded> and tracks operations to
-hash-refs. You won't instantiate this class.
+This module is part of L<Test::AutoMock::Mock::Overloaded> and tracks
+operations to hash-refs. You won't instantiate this class.
 
 For the sake of simplicity, we use the notation C<{key}> for C<FETCH> and
 C<STORE>. For other tie methods, record with the original name.

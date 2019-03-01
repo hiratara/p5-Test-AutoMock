@@ -1,24 +1,24 @@
 use strict;
 use warnings;
-use Test::AutoMock::Overloaded;
+use Test::AutoMock qw(mock_overloaded manager);
 use Test::More import => [qw(is done_testing)];
 
-my $mock = Test::AutoMock::Overloaded->new(
+my $mock = mock_overloaded(
     'hoge->bar' => sub { 1 },
 );
 
 is $mock->hoge->bar(10, 20), 1;
 
-$mock->automock_called_with_ok(
+manager($mock)->called_with_ok(
     'hoge->bar', [10, 20],
 );
-$mock->automock_called_ok('hoge->bar');
-$mock->automock_not_called_ok('bar');
+manager($mock)->called_ok('hoge->bar');
+manager($mock)->not_called_ok('bar');
 
-my $hoge = $mock->automock_child('hoge');
-$hoge->automock_called_with_ok(
+my $hoge = manager($mock)->child('hoge');
+$hoge->called_with_ok(
     'bar', [10, 20],
 );
-$hoge->automock_not_called_ok('hoge');
+$hoge->not_called_ok('hoge');
 
 done_testing;

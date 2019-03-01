@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 use Test::More import => [qw(ok is is_deeply done_testing)];
-use Test::AutoMock::Overloaded;
+use Test::AutoMock qw(mock_overloaded manager);
 
-my $mock = Test::AutoMock::Overloaded->new;
+my $mock = mock_overloaded;
 my $code = $mock->get_code;
 my $ret = $code->();
 ok $ret->{result} ? 1 : 0;
 
-my @calls = $mock->automock_calls;
+my @calls = manager($mock)->calls;
 is @calls, 4;
 is_deeply $calls[0], ['get_code', []];
 is_deeply $calls[1], ['get_code->()', []];
