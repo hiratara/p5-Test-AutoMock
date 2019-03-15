@@ -67,7 +67,7 @@ methods, may be subject to BACKWARD INCOMPATIBLE CHANGES.
 
 # FUNCTIONS
 
-## mock
+## `mock`
 
     my $mock = mock(
         methods => {
@@ -80,21 +80,21 @@ methods, may be subject to BACKWARD INCOMPATIBLE CHANGES.
 Create [Test::AutoMock::Mock::Basic](https://metacpan.org/pod/Test::AutoMock::Mock::Basic) instance. It takes the following
 parameters.
 
-- methods
+- `methods`
 
     A hash-ref of method definitions. See [Test::AutoMock::Manager::add\_method](https://metacpan.org/pod/Test::AutoMock::Manager::add_method).
 
-- isa
+- `isa`
 
     A super class of this mock. See [Test::AutoMock::Manager::isa](https://metacpan.org/pod/Test::AutoMock::Manager::isa).
     To specify multiple classes, use array-ref.
 
-## mock\_overloaded
+## `mock_overloaded`
 
 It is the same as the mock method except that the generated instance is
 [Test::AutoMock::Mock::Overloaded](https://metacpan.org/pod/Test::AutoMock::Mock::Overloaded).
 
-## manager
+## `manager`
 
 Access the [Test::AutoMock::Manager](https://metacpan.org/pod/Test::AutoMock::Manager) of the mock instance. You can set up and
 verify the mock with the Manager object. See [Test::AutoMock::Manager](https://metacpan.org/pod/Test::AutoMock::Manager)
