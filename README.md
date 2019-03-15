@@ -1,3 +1,4 @@
+[![Build Status](https://circleci.com/gh/hiratara/p5-Test-AutoMock.svg)](https://circleci.com/gh/hiratara/p5-Test-AutoMock)
 # NAME
 
 Test::AutoMock - A mock that can be used with a minimum setup

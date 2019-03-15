@@ -6,24 +6,26 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: cacheminil-20190209
+          key: cacheminil-v2
       - run:
           name: Install Minilla
           command: |
             cpanm Minilla
       - save_cache:
-          key: cacheminil-20190209
+          key: cacheminil-v2
           paths:
             - "/usr/local/bin"
-            - "/usr/local/lib/perl5/site_perl/5.28.0"
+            - "/usr/local/lib/perl5/site_perl"
       - restore_cache:
-          key: cachelocal-20190209-{{ checksum "cpanfile" }}
+          keys:
+            - cachelocal-v2-{{ checksum "cpanfile" }}
+            - cachelocal-v2-
       - run:
           name: Build
           command: |
             minil build
       - save_cache:
-          key: cachelocal-20190209-{{ checksum "cpanfile" }}
+          key: cachelocal-v2-{{ checksum "cpanfile" }}
           paths:
             - "local"
       - run:
