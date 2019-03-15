@@ -75,7 +75,7 @@ mock can not be injected from outside.
 
 =head1 FUNCTIONS
 
-=head2 patch_sub
+=head2 C<patch_sub>
 
     patch_sub {
         my ($mock, $other_mock) = @_;

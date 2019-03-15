@@ -65,7 +65,7 @@ a wrapper defined for L<Test::AutoMock>.
 
 =head1 FUNCTIONS
 
-=head2 new_mock
+=head2 C<new_mock>
 
   my $mock1 = new_mock('Test::AutoMock::Mock::Basic');
   my $mock2 = new_mock(
@@ -76,7 +76,7 @@ a wrapper defined for L<Test::AutoMock>.
 This is a constructor. Pass in the name of the class to instantiate as
 the first argument.
 
-=head2 get_manager
+=head2 C<get_manager>
 
 Get the manager object of the mock.
 

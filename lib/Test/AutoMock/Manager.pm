@@ -349,7 +349,7 @@ L<Test::AutoMock::Mock::Basic> and L<Test::AutoMock::Mock::Overloaded>.
 
 =head1 METHODS
 
-=head2 add_method
+=head2 C<add_method>
 
     manager($mock)->add_method(add_one => sub { $_[0] + 1 });
     manager($mock)->add_method('path->to->some_obj->name' => 'some_obj');
@@ -364,17 +364,17 @@ you'll get an error.
 
 The second argument specifies the return value when the method is called.
 If you specify a code reference, that code will be called on method invocation.
-Be aware that nither C<$mock> nor C<manager($mock)> are not included
+Be aware that neither C<$mock> nor C<manager($mock)> are not included
 in arguments.
 
-=head2 set_isa
+=head2 C<set_isa>
 
     manager($mock)->set_isa('Foo', 'Hoge');
 
 Specify the superclass of the mock. This specification only affects the C<isa>
 method. It is convenient when argument is checked like L<Moose> field.
 
-=head2 child
+=head2 C<child>
 
     # return the manager($mock->some_field)
     manager($mock)->child('some_field');
@@ -385,12 +385,12 @@ assertions.
 
 TODO: Support C<< -> >> notations.
 
-=head2 mock
+=head2 C<mock>
 
 It returns the mock that this manager manages.
 See also L<Test::AutoMock::manager>.
 
-=head2 calls
+=head2 C<calls>
 
     my @calls = manager($mock)->calls;
 
@@ -402,18 +402,18 @@ Method calls to children are also recorded in C<$mock>. For example, calling
 C<< $mock->child->do_it >> will record two calls C<'child'> and
 C<< 'child->do_it' >>.
 
-=head2 reset
+=head2 C<reset>
 
 Erase all recorded method calls. Delete all method call history from descendant
 mocks as well. It is used when you want to reuse mock.
 
-=head2 called_ok
+=head2 C<called_ok>
 
     manager($mock)->called_ok('hoge->bar');
 
 Checks if the method was called. It is supposed to be used with L<Test::More> .
 
-=head2 called_with_ok
+=head2 C<called_with_ok>
 
     manager($mock)->called_with_ok(
         'hoge->bar', [10, 20],
@@ -421,7 +421,7 @@ Checks if the method was called. It is supposed to be used with L<Test::More> .
 
 Checks if the method was called with specified arguments.
 
-=head2 not_called_ok
+=head2 C<not_called_ok>
 
     manager($mock)->not_called_ok('hoge->bar');
 

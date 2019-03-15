@@ -91,7 +91,7 @@ methods, may be subject to BACKWARD INCOMPATIBLE CHANGES.
 
 =head1 FUNCTIONS
 
-=head2 mock
+=head2 C<mock>
 
   my $mock = mock(
       methods => {
@@ -106,23 +106,23 @@ parameters.
 
 =over 4
 
-=item methods
+=item C<methods>
 
 A hash-ref of method definitions. See L<Test::AutoMock::Manager::add_method>.
 
-=item isa
+=item C<isa>
 
 A super class of this mock. See L<Test::AutoMock::Manager::isa>.
 To specify multiple classes, use array-ref.
 
 =back
 
-=head2 mock_overloaded
+=head2 C<mock_overloaded>
 
 It is the same as the mock method except that the generated instance is
 L<Test::AutoMock::Mock::Overloaded>.
 
-=head2 manager
+=head2 C<manager>
 
 Access the L<Test::AutoMock::Manager> of the mock instance. You can set up and
 verify the mock with the Manager object. See L<Test::AutoMock::Manager>

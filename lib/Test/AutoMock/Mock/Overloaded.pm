@@ -92,7 +92,7 @@ as C<< manager($mock)->called_ok >> and C<< manager($mock)->add_method >>.
 
 =head2 OPERATOR OVERLOADING
 
-The method name enclosed in backtick(C<`>) means operator overloading. The
+The method name enclosed in back-tick (C<`>) means operator overloading. The
 operator name is the same as the L<overload> module.
 
 Most operator overloads return child AutoMock, just like regular methods.
