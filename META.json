@@ -63,7 +63,7 @@
          "web" : "https://github.com/hiratara/p5-Test-AutoMock"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Masahiro Honma <hira.tara@gmail.com>"
    ],

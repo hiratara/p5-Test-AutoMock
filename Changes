@@ -1,6 +1,8 @@
 Revision history for Perl extension Test-AutoMock
 
 {{$NEXT}}
+
+0.02 2019-03-29T03:03:21Z
     - fix tests failed on older perls
 
 0.01 2019-03-15T03:14:54Z
