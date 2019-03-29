@@ -1,34 +1,48 @@
-version: 2
+version: 2.1
+
 jobs:
-  build:
+  test:
+    parameters:
+      perl-version:
+        type: string
     docker:
-      - image: perl:5.28
+      - image: perl:<< parameters.perl-version >>
     steps:
       - checkout
       - restore_cache:
-          key: cacheminil-v2
+          key: cacheminil-<< parameters.perl-version >>-v1
       - run:
           name: Install Minilla
           command: |
             cpanm Minilla
       - save_cache:
-          key: cacheminil-v2
+          key: cacheminil-<< parameters.perl-version >>-v1
           paths:
             - "/usr/local/bin"
             - "/usr/local/lib/perl5/site_perl"
       - restore_cache:
           keys:
-            - cachelocal-v2-{{ checksum "cpanfile" }}
-            - cachelocal-v2-
+            - cachelocal-<< parameters.perl-version >>-v1-{{ checksum "cpanfile" }}
+            - cachelocal-<< parameters.perl-version >>-v1-
       - run:
           name: Build
           command: |
             minil build
       - save_cache:
-          key: cachelocal-v2-{{ checksum "cpanfile" }}
+          key: cachelocal-<< parameters.perl-version >>-v1-{{ checksum "cpanfile" }}
           paths:
             - "local"
       - run:
           name: Test
           command: |
             minil test
+
+workflows:
+  build:
+    jobs:
+      - test:
+          name: "test-latest"
+          perl-version: "5.28"
+      - test:
+          name: "test-older"
+          perl-version: "5.24"
