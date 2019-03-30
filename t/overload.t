@@ -256,7 +256,10 @@ use Test::AutoMock qw(mock_overloaded manager);
             $] >= 5.012
                 ? (
                     ['z->`-X`', ['e', '']],
-                    ['z->`-X`->`bool`', [undef, '']],
+                    (
+                        $] >= 5.018 ? (['z->`-X`->`bool`', [undef, '']])
+                                    : ()
+                    ),
                 ) : (
                     ['z->`""`', [undef, '']],
                 )
