@@ -54,7 +54,7 @@ use Test::AutoMock qw(mock_overloaded manager);
         ['ref_array->[0]', []],
         ['ref_array->[0]->some_other_method', []],
         ['ref_array->[1]', [10]],
-        ($] < 5.024 ? (['ref_array->FETCHSIZE', []]) : ()),
+        ($] < 5.020 ? (['ref_array->FETCHSIZE', []]) : ()),
         ['ref_array->[1]', []],
         ['ref_array->FETCHSIZE', []],
         ['ref_array->STORESIZE', [3]],
