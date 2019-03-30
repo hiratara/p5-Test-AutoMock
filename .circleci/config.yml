@@ -13,26 +13,26 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: cacheminil-<< parameters.perl-version >>-v1
+          key: cacheminil-<< parameters.perl-version >>-v2
       - run:
           name: Install Minilla
           command: |
             cpanm Minilla
       - save_cache:
-          key: cacheminil-<< parameters.perl-version >>-v1
+          key: cacheminil-<< parameters.perl-version >>-v2
           paths:
             - "/usr/local/bin"
-            - "/usr/local/lib/perl5/site_perl"
+            - "/usr/local/lib/perl5"
       - restore_cache:
           keys:
-            - cachelocal-<< parameters.perl-version >>-v1-{{ checksum "cpanfile" }}
-            - cachelocal-<< parameters.perl-version >>-v1-
+            - cachelocal-<< parameters.perl-version >>-v2-{{ checksum "cpanfile" }}
+            - cachelocal-<< parameters.perl-version >>-v2-
       - run:
           name: Build
           command: |
             minil build
       - save_cache:
-          key: cachelocal-<< parameters.perl-version >>-v1-{{ checksum "cpanfile" }}
+          key: cachelocal-<< parameters.perl-version >>-v2-{{ checksum "cpanfile" }}
           paths:
             - "local"
       - run:
