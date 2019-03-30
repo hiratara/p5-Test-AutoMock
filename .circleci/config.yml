@@ -3,10 +3,13 @@ version: 2.1
 jobs:
   test:
     parameters:
+      perl-repository:
+        type: string
+        default: ""
       perl-version:
         type: string
     docker:
-      - image: perl:<< parameters.perl-version >>
+      - image: << parameters.perl-repository >>perl:<< parameters.perl-version >>
     steps:
       - checkout
       - restore_cache:
@@ -46,3 +49,7 @@ workflows:
       - test:
           name: "test-older"
           perl-version: "5.24"
+      - test:
+          name: "test-oldest"
+          perl-version: "5.10.1"
+          perl-repository: "hiratara/"
